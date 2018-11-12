@@ -1,0 +1,50 @@
+/* 13. Basic Styling with CSS */
+
+/* Style the lines by removing the fill and applying a stroke */
+.line {
+    fill: none;
+    stroke: #ffab00;
+    stroke-width: 3;
+}
+.error-line {
+  stroke: grey;
+}
+
+.error-cap {
+  stroke: grey;
+  stroke-width: 2px;
+  stroke-type: solid;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+/* Style the dots by assigning a fill and stroke */
+.dot {
+    fill: #ffab00;
+    stroke: #fff;
+}
+
+.axeslabel{
+  font-size: 30px;
+}
+/* Axis Properties */
+
+.axis {
+  font: 15px sans-serif;
+  font-weight: 1px;
+}
+
+.axis path, line {
+  fill: None;
+  stroke: #00000;
+  shape-rendering: crispEdges;
+  stroke-width: 1px;
+}
+
+.ztfname {
+  alignment-baseline: before-edge;
+  font-size: 50px;
+}

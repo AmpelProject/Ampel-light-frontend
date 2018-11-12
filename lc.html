@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Body tag is where we will append our SVG and SVG objects-->
+<body>
+</body>
+
+<!-- Load in the d3 library -->
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<link href="stylesheet.css" rel="stylesheet" type="text/css">
+<script src="config.js"></script>
+<script src="plot_toolbox.js"></script>
+<script src="load_data.js"></script>
+
+<script>
+// The number of datapoints
+
+// Data, from load_data
+var _ = get_datatest();
+  dataall = _[0],
+  dataset = _[1],
+  datasetupper = _[2],
+  transient = _[3];
+
+// From plot_toolbox
+// define figure
+var _ = set_fig(dataall);
+var svg    = _[0],
+    xScale = _[1],
+    yScale = _[2];
+
+// Error errorBar
+add_errorbar(svg, dataset)
+
+// Scatter Plot
+add_scatter(svg, dataset)
+
+// Upper limits
+add_upperlimits(svg, datasetupper);
+
+
+// Target name
+svg.append("text")
+        .attr("class", "ztfname") // Assign a class for styling
+        .attr("y", 0)
+        .attr("x", 10)
+        .style('fill', d3.rgb(230,230,230))
+        .text(transient["ztfName"]);
+
+
+</script>
