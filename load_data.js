@@ -357,3 +357,30 @@ function get_datatest () {
   }
   return [dataall, dataset, datasetupper, transient];
 }
+
+function load_transient_data (baseURL, targetName, callback) {
+  var transient = null;
+  $.getJSON(baseURL+"/download?path=%2F"+targetName+"&files=transient.json",
+    null,
+    function (transient) { 
+      $.getJSON(baseURL+"/download?path=%2F"+targetName+"&files=dump.json",
+        null,
+        function (dump) {
+          transient["ztfName"] = get_ztfname(String(transient["tran_id"]));
+          var i=0, j=0, k=0;
+          const photopoints = dump.photopoints;
+          var detections = [];
+          var upper_limits = [];
+          for (i=0; i< photopoints.length; i++) {
+              if (photopoints[i].content._id>0) {
+                detections[j] = photopoints[i].content;
+                j++;
+              } else {
+                upper_limits[k] = photopoints[i].content;
+                k++;
+              }
+          }
+          callback(transient, detections, upper_limits);
+        })
+    });
+}

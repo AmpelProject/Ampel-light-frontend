@@ -37,16 +37,144 @@
               }
     };
 
-    var _ = get_datatest();
-        dataall = _[0],
-        dataset = _[1],
-        datasetupper = _[2],
-        transient = _[3];
+    function load_sdss_image(transient) {
+      document.getElementById("sdsslink").setAttribute("href", "http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra="+transient.ra+"&dec="+transient.dec+"&scale=0.1981");
+      document.getElementById("marshallink").setAttribute("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+transient.ztfName);
+      var sdssimg = document.getElementById("sdssimg");
+      sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
+    }
 
-    var lcdata = get_plotly_data(dataset);
-    var lclims = get_plotly_upperlimit(datasetupper);
-    transient.ra = Plotly.d3.mean(dataset.map( function(d) {d.ra}));
-    transient.dec = Plotly.d3.mean(dataset.map( function(d) {d.dec}));
+    function prepare_plotly_data(transient, detections, upper_limits) {
+      transient["ra"]  = Plotly.d3.min(detections.map( function(d) {return d.ra;}));
+      transient["dec"] = Plotly.d3.min(detections.map( function(d) {return d.dec;}));
+      $("#targetname").html(transient.ztfName);
+      
+      var lcdata = get_plotly_data(detections);
+      var lclims = get_plotly_upperlimit(upper_limits);
+      create_plot(transient, lcdata, lclims);
+    }
+
+    function create_plot(transient, lcdata, lclims) {
+
+      // FIXME make async
+      load_sdss_image(transient);
+
+      var data = [
+          // PhotoPoints
+          {
+            x: lcdata.x,
+            y: lcdata.y,
+            error_y: {
+              type: 'data',
+              array: lcdata.dy,
+              color: "grey",
+            },
+            text: lcdata.id,
+            // shape
+            mode: 'markers',
+            type: 'scatter',
+            name: "photopoints",
+            marker: {
+              size: 15,
+              color: lcdata.colors,
+              line: {width:1, color:"grey"},
+            }
+          },
+          //Upper Limits
+          {
+            x: lclims.x,
+            y: lclims.y,
+            mode: 'markers',
+            type: 'scatter',
+            name: "upper limits",
+            marker: {
+              size: 15,
+              color: lcdata.colors,
+              symbol: 6,
+
+            }
+          }
+      ];
+
+
+        var margin = {top:30};
+        var myDiv = document.getElementById('lc_plot');
+        var sdssimg = document.getElementById("sdssimg");
+        var layout = {
+            //title: transient.ztfName,
+            autoscale: false,
+            height: "px",
+            margin: {t: margin.top},
+            font: {size: 18},
+            showlegend: true,
+            legend: {
+                bgcolor: "rgba(255,255,255,0.1)",
+                x: 0.,
+                y: 1,
+                //traceorder: 'normal',
+                font: {
+                  family: 'Arial, sans-serif',
+                  size: 12,
+                }
+              },
+            xaxis: {
+              mirror:'ticks',
+              linewidth: 1,
+              tickfont: {
+                  family: 'Arial, sans-serif',
+                  size: 14,
+                  color: 'grey'
+                },
+              title: "Date",
+              titlefont: {
+                  family: 'Arial, sans-serif',
+                  size: 18,
+                  color: 'grey'
+                },
+            },
+            yaxis: {
+              mirror:'ticks',
+              autorange: 'reversed',
+              linewidth: 1,
+              tickfont: {
+                  family: 'Arial, sans-serif',
+                  size: 14,
+                  color: 'grey'
+                },
+              title: "Mag (magpsf)",
+              titlefont: {
+                  family: 'Arial, sans-serif',
+                  size: 18,
+                  color: 'grey'
+                },
+            },
+          };
+
+        var config = {
+          responsive: true,
+          displayModeBar:false
+        };
+
+
+        var plot = Plotly.newPlot(myDiv, data, layout, config);
+      
+    }
+
+    $(document).ready(
+      function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetName = urlParams.get('target');
+        const channel = urlParams.get('channel');
+        var url = window.location.href.substr(0, window.location.href.lastIndexOf('?'));
+        url = url.substr(0, url.lastIndexOf('/'));
+        $.getJSON(url+'/'+channel+'/channel.json',
+          null,
+          function (channel_config) {
+            load_transient_data(channel_config['baseURL'], targetName, prepare_plotly_data);
+          })
+      }
+    );
+
   </script>
 
 </head>
@@ -67,8 +195,8 @@
       </li>
     </ul>
 
-    <form class="form-inline my-2 my-lg-0  ml-auto">
-        <input class="form-control mr-sm-2" type="search" placeholder="Target Name" aria-label="Search">
+    <form class="form-inline my-2 my-lg-0  ml-auto", method="GET">
+        <input class="form-control mr-sm-2" type="search" id="target" name="target", placeholder="Target Name" aria-label="Search">
     </form>
 
   </nav>
@@ -124,122 +252,5 @@
 
   </footer>
   </wrapper>
-  <script>
-
-  var data = [
-      // PhotoPoints
-      {
-        x: lcdata.x,
-        y: lcdata.y,
-        error_y: {
-          type: 'data',
-          array: lcdata.dy,
-          color: "grey",
-        },
-        text: lcdata.id,
-        // shape
-        mode: 'markers',
-        type: 'scatter',
-        name: "photopoints",
-        marker: {
-          size: 15,
-          color: lcdata.colors,
-          line: {width:1, color:"grey"},
-        }
-      },
-      //Upper Limits
-      {
-        x: lclims.x,
-        y: lclims.y,
-        mode: 'markers',
-        type: 'scatter',
-        name: "upper limits",
-        marker: {
-          size: 15,
-          color: lcdata.colors,
-          symbol: 6,
-
-        }
-      }
-  ];
-
-
-    var margin = {top:30};
-    var myDiv = document.getElementById('lc_plot');
-    var sdssimg = document.getElementById("sdssimg");
-    var layout = {
-        //title: transient.ztfName,
-        autoscale: false,
-        height: "px",
-        margin: {t: margin.top},
-        font: {size: 18},
-        showlegend: true,
-        legend: {
-            bgcolor: "rgba(255,255,255,0.1)",
-            x: 0.,
-            y: 1,
-            //traceorder: 'normal',
-            font: {
-              family: 'Arial, sans-serif',
-              size: 12,
-            }
-          },
-        xaxis: {
-          mirror:'ticks',
-          linewidth: 1,
-          tickfont: {
-              family: 'Arial, sans-serif',
-              size: 14,
-              color: 'grey'
-            },
-          title: "Date",
-          titlefont: {
-              family: 'Arial, sans-serif',
-              size: 18,
-              color: 'grey'
-            },
-        },
-        yaxis: {
-          mirror:'ticks',
-          autorange: 'reversed',
-          linewidth: 1,
-          tickfont: {
-              family: 'Arial, sans-serif',
-              size: 14,
-              color: 'grey'
-            },
-          title: "Mag (magpsf)",
-          titlefont: {
-              family: 'Arial, sans-serif',
-              size: 18,
-              color: 'grey'
-            },
-        },
-      };
-
-    var config = {
-      responsive: true,
-      displayModeBar:false
-    };
-
-
-    var plot = Plotly.newPlot(myDiv, data, layout, config);
-
-
-    </script>
-
-
-    <script>
-    transient["ra"]  = Plotly.d3.min(dataset.map( function(d) {return d.ra;}));
-    transient["dec"] = Plotly.d3.min(dataset.map( function(d) {return d.dec;}));
-    $("#targetname").html(transient.ztfName);
-
-    document.getElementById("sdsslink").setAttribute("href", "http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra="+transient.ra+"&dec="+transient.dec+"&scale=0.1981");
-    document.getElementById("marshallink").setAttribute("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+transient.ztfName);
-    var sdssimg = document.getElementById("sdssimg");
-    sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
-    </script>
-
-
 
 </body>
