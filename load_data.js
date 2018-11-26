@@ -338,7 +338,6 @@ function get_datatest () {
 
 
 
-
   // Parsing data
   var i=0,
       j=0,

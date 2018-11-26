@@ -1,54 +1,245 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
-
-<!-- Body tag is where we will append our SVG and SVG objects-->
 <body>
+
+<head>
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+  </style>
+
+  <script src="config.js"></script>
+
+  <script src="load_data.js"></script>
+
+  <script src="toolbox.js"></script>
+
+  <script>
+    function get_plotly_data(d_) {
+        return {"x": d_.map( function(d) {return julianIntToDate(d.jd);} ),
+                "y": d_.map( function(d) {return d.magpsf;} ),
+                "dy": d_.map( function(d) {return d.sigmapsf;} ),
+                "fid":d_.map( function(d) {return d.fid;}),
+                "id":d_.map( function(d) {return d._id;}),
+                // For Plotting
+                "colors":d_.map( function(d) {return ZTFDATA[d.fid].color;}),
+              }
+      };
+
+    function get_plotly_upperlimit(d_) {
+        return {"x": d_.map( function(d) {return julianIntToDate(d.jd);} ),
+                "y": d_.map( function(d) {return d.diffmaglim;} ),
+                "fid":d_.map( function(d) {return d.fid;} ),
+                // For Plotting
+                "colors":d_.map( function(d) {return ZTFDATA[d.fid].color;}),
+              }
+    };
+
+    var _ = get_datatest();
+        dataall = _[0],
+        dataset = _[1],
+        datasetupper = _[2],
+        transient = _[3];
+
+    var lcdata = get_plotly_data(dataset);
+    var lclims = get_plotly_upperlimit(datasetupper);
+    transient.ra = Plotly.d3.mean(dataset.map( function(d) {d.ra}));
+    transient.dec = Plotly.d3.mean(dataset.map( function(d) {d.dec}));
+  </script>
+
+</head>
+
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <ul class="navbar-nav">
+
+      <li class="nav-item active">
+        <a id="marshallink" class="btn btn-outline-light btn-md" role="button" aria-pressed="true" style="margin-top: 5px"><i class="fa fa-download"></i></a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" id="targetname"></a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">Channel</a>
+      </li>
+    </ul>
+
+    <form class="form-inline my-2 my-lg-0  ml-auto">
+        <input class="form-control mr-sm-2" type="search" placeholder="Target Name" aria-label="Search">
+    </form>
+
+  </nav>
+
+
+
+
+  <wrapper class="d-flex flex-column">
+    <main role="main" class="container-fluid" style="margin-top: 10">
+      <div class="row">
+        <div class="col-md-8 col-sm-12" id="lc_plot"> </div>
+
+        <div class="col-md-push-9 col-md-3 col-sm-4"  style="margin-top: 30">
+
+              <a id="sdsslink" target="_blank">
+                <div class="thumbnail">
+                  <img id="sdssimg" class="img-fluid" alt="Responsive image">
+                </div>
+              </a>
+              <div class="row">
+                <div class="col-12"  style="margin-top: 10">
+                  <a id="marshallink" class="btn btn-outline-dark btn-md btn-block" role="button" aria-pressed="true">Access the marshal</a>
+                </div>
+              </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12"><hr size="50"></div>
+      </div>
+      <div class="row text-center text-middle">
+
+      </div>
+
+  </main>
+  <footer class="footer fixed-bottom text-center bg-light border-top">
+    <nav class="navbar navbar-expand-sm bg-light py-0 navbar-light" style="font-size:15px">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link">Ampel</a>
+        </li>
+        <li class="nav-item">
+          <div class="nav-link"> | </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mailto:ampel-info@desy.de">Contact us</a>
+        </li>
+      </ul>
+
+      <form class="form-inline my-2 my-lg-0  ml-auto">
+          <a class="nav-link fa" style="color:black;font-size:24px" href="https://github.com/AmpelProject" target="_blank"> &#xf09b; </a>
+      </form>
+    </nav>
+
+  </footer>
+  </wrapper>
+  <script>
+
+  var data = [
+      // PhotoPoints
+      {
+        x: lcdata.x,
+        y: lcdata.y,
+        error_y: {
+          type: 'data',
+          array: lcdata.dy,
+          color: "grey",
+        },
+        text: lcdata.id,
+        // shape
+        mode: 'markers',
+        type: 'scatter',
+        name: "photopoints",
+        marker: {
+          size: 15,
+          color: lcdata.colors,
+          line: {width:1, color:"grey"},
+        }
+      },
+      //Upper Limits
+      {
+        x: lclims.x,
+        y: lclims.y,
+        mode: 'markers',
+        type: 'scatter',
+        name: "upper limits",
+        marker: {
+          size: 15,
+          color: lcdata.colors,
+          symbol: 6,
+
+        }
+      }
+  ];
+
+
+    var margin = {top:30};
+    var myDiv = document.getElementById('lc_plot');
+    var sdssimg = document.getElementById("sdssimg");
+    var layout = {
+        //title: transient.ztfName,
+        autoscale: false,
+        height: "px",
+        margin: {t: margin.top},
+        font: {size: 18},
+        showlegend: true,
+        legend: {
+            bgcolor: "rgba(255,255,255,0.1)",
+            x: 0.,
+            y: 1,
+            //traceorder: 'normal',
+            font: {
+              family: 'Arial, sans-serif',
+              size: 12,
+            }
+          },
+        xaxis: {
+          mirror:'ticks',
+          linewidth: 1,
+          tickfont: {
+              family: 'Arial, sans-serif',
+              size: 14,
+              color: 'grey'
+            },
+          title: "Date",
+          titlefont: {
+              family: 'Arial, sans-serif',
+              size: 18,
+              color: 'grey'
+            },
+        },
+        yaxis: {
+          mirror:'ticks',
+          autorange: 'reversed',
+          linewidth: 1,
+          tickfont: {
+              family: 'Arial, sans-serif',
+              size: 14,
+              color: 'grey'
+            },
+          title: "Mag (magpsf)",
+          titlefont: {
+              family: 'Arial, sans-serif',
+              size: 18,
+              color: 'grey'
+            },
+        },
+      };
+
+    var config = {
+      responsive: true,
+      displayModeBar:false
+    };
+
+
+    var plot = Plotly.newPlot(myDiv, data, layout, config);
+
+
+    </script>
+
+
+    <script>
+    transient["ra"]  = Plotly.d3.min(dataset.map( function(d) {return d.ra;}));
+    transient["dec"] = Plotly.d3.min(dataset.map( function(d) {return d.dec;}));
+    $("#targetname").html(transient.ztfName);
+
+    document.getElementById("sdsslink").setAttribute("href", "http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra="+transient.ra+"&dec="+transient.dec+"&scale=0.1981");
+    document.getElementById("marshallink").setAttribute("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+transient.ztfName);
+    var sdssimg = document.getElementById("sdssimg");
+    sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
+    </script>
+
+
+
 </body>
-
-<!-- Load in the d3 library -->
-
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-<link href="stylesheet.css" rel="stylesheet" type="text/css">
-<script src="config.js"></script>
-<script src="plot_toolbox.js"></script>
-<script src="load_data.js"></script>
-
-<script>
-// The number of datapoints
-
-// Data, from load_data
-var _ = get_datatest();
-  dataall = _[0],
-  dataset = _[1],
-  datasetupper = _[2],
-  transient = _[3];
-
-// From plot_toolbox
-// define figure
-var _ = set_fig(dataall);
-var svg    = _[0],
-    xScale = _[1],
-    yScale = _[2];
-
-// Error errorBar
-add_errorbar(svg, dataset)
-
-// Scatter Plot
-add_scatter(svg, dataset)
-
-// Upper limits
-add_upperlimits(svg, datasetupper);
-
-
-// Target name
-svg.append("text")
-        .attr("class", "ztfname") // Assign a class for styling
-        .attr("y", 0)
-        .attr("x", 10)
-        .style('fill', d3.rgb(230,230,230))
-        .text(transient["ztfName"]);
-
-
-</script>
