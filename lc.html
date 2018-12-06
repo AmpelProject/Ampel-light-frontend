@@ -73,7 +73,7 @@
       $("#comp-id").text(transient.latest_state.$binary)
       $.each(transient.journal, function(k, v){
         $("#t0-runs").append('<li id="run-item-' + k + '">' + JSON.stringify(v) + '</li>');
-        $("#t0-list").append('<a class="list-group-item list-group-item-action" href="#run-item-' + k + '">' + v.dt + '</a>')
+        $("#t0-list").append('<a class="list-group-item list-group-item-action" href="#run-item-' + k + '">' + unixTimestampToDate(v.dt) + '</a>')
       })
       //$("#t0-runs").text(JSON.transient.journal)
     }
