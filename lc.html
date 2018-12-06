@@ -8,6 +8,16 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <style>
+    .anyClass {
+  height:280px;
+  overflow-y: scroll;
+}
+.anyClass2 {
+  height:280px;
+  overflow-y: scroll;
+  font-size: 18px;
+}
+
   </style>
 
   <script src="config.js"></script>
@@ -58,6 +68,14 @@
       var lclims = get_plotly_upperlimit(upper_limits);
       // alert(detections[0]._id);
       create_plot(transient, lcdata, lclims);
+
+      $("#tran-id").text(transient.tran_id);
+      $("#comp-id").text(transient.latest_state.$binary)
+      $.each(transient.journal, function(k, v){
+        $("#t0-runs").append('<li id="run-item-' + k + '">' + JSON.stringify(v) + '</li>');
+        $("#t0-list").append('<a class="list-group-item list-group-item-action" href="#run-item-' + k + '">' + v.dt + '</a>')
+      })
+      //$("#t0-runs").text(JSON.transient.journal)
     }
 
     function create_plot(transient, lcdata, lclims) {
@@ -241,7 +259,33 @@
         <div class="col-12"><hr size="50"></div>
       </div>
       <div class="row text-center text-middle">
-
+        <div class="col-4">
+          <table class="table table-hover">
+            <colgroup>
+              <col class="bg-light"></col>
+            </colgroup>
+            <tbody>
+              <tr>
+                <th>Transient ID</th>
+                <td id="tran-id"></td>
+              </tr>
+              <tr>
+                <th>Compound ID</th>
+                <td id="comp-id"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-2 anyClass">
+          <div id="t0-list" class="list-group">
+          </div>
+        </div>
+        <div class="col-6 anyClass2">
+          <div data-spy="scroll" data-target="#run-list" data-offset=0>
+            <ul id="t0-runs">
+            </ul>
+          </div>
+        </div>
       </div>
 
   </main>
