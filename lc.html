@@ -214,6 +214,8 @@
         const urlParams = new URLSearchParams(window.location.search);
         const targetName = urlParams.get('target');
         const channel = urlParams.get('channel');
+        $("#channelname").html(channel);
+        $("#channelname-form").attr('value',channel);
         var url = window.location.href.substr(0, window.location.href.lastIndexOf('?'));
         url = url.substr(0, url.lastIndexOf('/'));
         $.getJSON(url+'/'+channel+'/channel.json',
@@ -240,12 +242,13 @@
       </li>
 
       <li class="nav-item">
-        <a class="nav-link" href="#">Channel</a>
+        <a class="nav-link" id="channelname" href="#">Channel</a>
       </li>
     </ul>
 
     <form class="form-inline my-2 my-lg-0  ml-auto", method="GET">
         <input class="form-control mr-sm-2" type="search" id="target" name="target", placeholder="Target Name" aria-label="Search">
+        <input type="hidden" id="channelname-form" name="channel">
     </form>
 
   </nav>
