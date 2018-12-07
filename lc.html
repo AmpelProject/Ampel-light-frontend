@@ -32,23 +32,23 @@
 
   <script>
     function get_plotly_data(d_, channel_config) {
-        return {"x": d_.map( function(d) {return julianDateToDate(d.jd);} ),
-                "y": d_.map( function(d) {return d.magpsf;} ),
-                "dy": d_.map( function(d) {return d.sigmapsf;} ),
-                "fid":d_.map( function(d) {return d.fid;}),
-                "id":d_.map( function(d) {return d._id['$numberLong'];}),
-                "cutoutURL":d_.map( function(d) { return channel_config.cutouts.public+"/download?files="+d._id['$numberLong']+".tgz";} ),
+        return {"x": d_.map( function(d) {return julianDateToDate(d.content.jd);} ),
+                "y": d_.map( function(d) {return d.content.magpsf;} ),
+                "dy": d_.map( function(d) {return d.content.sigmapsf;} ),
+                "fid":d_.map( function(d) {return d.content.fid;}),
+                "id":d_.map( function(d) {return d.content._id['$numberLong'];}),
+                "cutoutURL":d_.map( function(d) { return channel_config.cutouts.public+"/download?files="+d.content._id['$numberLong']+".tgz";} ),
                 // For Plotting
-                "colors":d_.map( function(d) {return ZTFDATA[d.fid].color;}),
+                "colors":d_.map( function(d) {return ZTFDATA[d.content.fid].color;}),
               }
       };
 
     function get_plotly_upperlimit(d_) {
-        return {"x": d_.map( function(d) {return julianIntToDate(d.jd);} ),
-                "y": d_.map( function(d) {return d.diffmaglim;} ),
-                "fid":d_.map( function(d) {return d.fid;} ),
+        return {"x": d_.map( function(d) {return julianDateToDate(d.content.jd);} ),
+                "y": d_.map( function(d) {return d.content.diffmaglim;} ),
+                "fid":d_.map( function(d) {return d.content.fid;} ),
                 // For Plotting
-                "colors":d_.map( function(d) {return ZTFDATA[d.fid].color;}),
+                "colors":d_.map( function(d) {return ZTFDATA[d.content.fid].color;}),
               }
     };
 
@@ -59,19 +59,19 @@
       sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
     }
 
-    function prepare_plotly_data(channel_config, transient, detections, upper_limits) {
-      transient["ra"]  = Plotly.d3.min(detections.map( function(d) {return d.ra;}));
-      transient["dec"] = Plotly.d3.min(detections.map( function(d) {return d.dec;}));
-      $("#targetname").html(transient.ztfName);
+    function prepare_plotly_data(channel_config, transientSummary, transientView) {
+      transientSummary["ra"]  = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.ra;}));
+      transientSummary["dec"] = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.dec;}));
+      $("#targetname").html(transientSummary.ztfName);
       
-      var lcdata = get_plotly_data(detections, channel_config);
-      var lclims = get_plotly_upperlimit(upper_limits);
+      var lcdata = get_plotly_data(transientView.photopoints, channel_config);
+      var lclims = get_plotly_upperlimit(transientView.upperlimits);
       // alert(detections[0]._id);
-      create_plot(transient, lcdata, lclims);
+      create_plot(transientSummary, lcdata, lclims);
 
-      $("#tran-id").text(transient.tran_id);
-      $("#comp-id").text(b64toHex(transient.latest_state.$binary));
-      $.each(transient.journal, function(k, v){
+      $("#tran-id").text(transientSummary.tran_id);
+      $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
+      $.each(transientSummary.journal, function(k, v){
         var dt = v.dt;
         delete v.dt;
         $("#t0-runs").append(
@@ -94,10 +94,10 @@
       });
     }
 
-    function create_plot(transient, lcdata, lclims) {
+    function create_plot(transientSummary, lcdata, lclims) {
 
       // FIXME make async
-      load_sdss_image(transient);
+      load_sdss_image(transientSummary);
 
       var data = [
           // PhotoPoints
@@ -127,6 +127,7 @@
             y: lclims.y,
             mode: 'markers',
             type: 'scatter',
+            hidden: true,
             name: "upper limits",
             marker: {
               size: 15,
