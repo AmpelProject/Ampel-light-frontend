@@ -12,7 +12,7 @@ function FITS(input){
 	this.xmp = "";    // Will hold the XMP string (for test purposes)
 	this.avmdata = false;
 	this.tags = {};
-	this.stretch = "linear";
+	this.stretch = "sqrt";
 	this.color = "viridis";
 	this.depth = 0;
 	this.z = 0;
@@ -175,9 +175,6 @@ FITS.prototype.draw = function(id,type){
 			// Looks like the element is a container for our <canvas>
 			el.setAttribute('id',this.id+'holder');
 			var canvas = document.createElement('canvas');
-			canvas.style.display='block';
-			canvas.setAttribute('width',this.width);
-			canvas.setAttribute('height',this.height);
 			canvas.setAttribute('id',this.id);
 			el.appendChild(canvas);
 			// For excanvas we need to initialise the newly created <canvas>
@@ -188,9 +185,6 @@ FITS.prototype.draw = function(id,type){
 			// <canvas> so we make a new one and replace it.
 			if(/*@cc_on!@*/false){
 				var canvas = document.createElement('canvas');
-				canvas.style.display='block';
-				canvas.setAttribute('width',this.width);
-				canvas.setAttribute('height',this.height);
 				canvas.setAttribute('id',this.id);
 				el.parentNode.replaceChild(canvas,el);
 				if(/*@cc_on!@*/false) el = G_vmlCanvasManager.initElement(elcanvas);

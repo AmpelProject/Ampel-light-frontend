@@ -24,7 +24,7 @@ function FitsViewer(input){
 		this.fits[labels[i]] = new FITS();
 	}
 	this.file = "";
-	this.stretches = ["linear","sqrt","cuberoot","log","loglog","sqrtlog"];
+	this.stretches = ["sqrt","cuberoot","linear"];
 	this.colors = ["grey","viridis"];
 	// Check for support of various functions:
 	this.capability = { 
@@ -63,47 +63,15 @@ function FitsViewer(input){
 		});
 	}
 
-
-	// Build the viewer here
-	var html = '';
-
-  html += '<div class="row">';
-	for (var k in this.fits) {
-		html += '<div id="col-md-2 col-sm-2"><canvas id="'+this.canvas+'_'+k+'"></canvas></div>';
-	}
-	html += '</div>';
-	html += '<div class="row">';
-  
-  html += '<div class="form-group"><label for="FITSViewerStretch">Stretch</label>'
-  html += '<select class="form-control form-control-sm" name="stretch" id="FITSViewerStretch">';
-  for(i = 0 ; i < this.stretches.length ; i++){
-    html += '<option'+(this.stretches[i]== this.fits.stretch ? ' selected="selected"' : '')+'>'+this.stretches[i]+'</option>';
-  }
-  html += '</select></div>';
-  html += '<div class="form-group"><label for="FITSViewerScale">Color</label>';
-  html += '<select class="form-control form-control-sm" name="scale" id="FITSViewerScale">';
-  for(i = 0 ; i < this.colors.length ; i++){
-    html += '<option'+(this.colors[i]== this.fits.color ? ' selected="selected"' : '')+'>'+this.colors[i]+'</option>';
-  }
-  html += '</select></div>';
-	html += '</div>';
-
-	$('#'+this.id+'').html(html);
-
-	// Bind events
- 	$('#'+this.id+' select.file').bind('change',{me:this}, function(e){
- 		e.data.me.fits.load($(this).val());
- 	});
- 	$('#'+this.id+' select[name="stretch"]').bind('change',{me:this}, function(e){
-		for (var k in e.data.me.fits) {
-	 		e.data.me.fits[k].update($(this).val());
-		}
- 	});
- 	$('#'+this.id+' select[name="scale"]').bind('change',{me:this}, function(e){
-		for (var k in e.data.me.fits) {
-	 		e.data.me.fits[k].update({color:$(this).val()});
-		}
- 	});
+  $('#'+this.id).bind("click", {me:this}, function(e) {
+    for (var k in e.data.me.fits) {
+      var fits = e.data.me.fits[k];
+      var i = e.data.me.stretches.indexOf(fits.stretch);
+      i += 1;
+      if (i == e.data.me.stretches.length) i = 0;
+      fits.update(e.data.me.stretches[i]);
+    }
+  });
 }
 
 

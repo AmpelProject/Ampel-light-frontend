@@ -222,9 +222,22 @@
   <wrapper class="d-flex flex-column">
     <main role="main" class="container-fluid" style="margin-top: 10">
       <div class="row">
-        <div class="col-md-8 col-sm-12" id="lc_plot"> </div>
-        <div class="col-md-push-9 col-md-3 col-sm-4"  style="margin-top: 30">
-              <div class="col-md-12 col-md-3 col-sm-4" id="FITSViewer"></div>
+        <div class="col-md-7 col-sm-12" id="lc_plot"> </div>
+        <div class="col-md-1 col-md-1 col-sm-1 text-center" id="FITSViewer" style="margin-top: 30">
+          <div class="thumbnail">
+            <canvas id="FITSimage_difference" class="img-responsive" alt="difference image"></canvas>
+          </div>
+          <div class="clearfix"></div>
+          <div class="thumbnail">
+            <canvas id="FITSimage_science" class="img-responsive" alt="science image" style="margin-top: 10"></canvas>
+          </div>
+          <div class="clearfix"></div>
+          <div class="thumbnail">
+            <canvas id="FITSimage_template" class="img-responsive" alt="reference image"  style="margin-top: 10"></canvas>
+          </div>
+        </div>
+        
+        <div class="col-md-push-8 col-md-3 col-sm-4"  style="margin-top: 30">
               <a id="sdsslink" target="_blank">
                 <div class="thumbnail">
                   <img id="sdssimg" class="img-fluid" alt="Responsive image">
