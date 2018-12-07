@@ -22,7 +22,7 @@
 
   <script>
     function get_plotly_data(d_, channel_config) {
-        return {"x": d_.map( function(d) {return julianIntToDate(d.jd);} ),
+        return {"x": d_.map( function(d) {return julianDateToDate(d.jd);} ),
                 "y": d_.map( function(d) {return d.magpsf;} ),
                 "dy": d_.map( function(d) {return d.sigmapsf;} ),
                 "fid":d_.map( function(d) {return d.fid;}),
