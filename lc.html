@@ -26,13 +26,18 @@
 
   <script src="toolbox.js"></script>
 
+  <script src="fits/gzip.js"></script>
+  <script src="fits/fits.js"></script>
+  <script src="fits/fitsviewer.js"></script>
+
   <script>
-    function get_plotly_data(d_) {
-        return {"x": d_.map( function(d) {return julianIntToDate(d.jd);} ),
+    function get_plotly_data(d_, channel_config) {
+        return {"x": d_.map( function(d) {return julianDateToDate(d.jd);} ),
                 "y": d_.map( function(d) {return d.magpsf;} ),
                 "dy": d_.map( function(d) {return d.sigmapsf;} ),
                 "fid":d_.map( function(d) {return d.fid;}),
-                "id":d_.map( function(d) {return d._id;}),
+                "id":d_.map( function(d) {return d._id['$numberLong'];}),
+                "cutoutURL":d_.map( function(d) { return channel_config.cutouts.public+"/download?files="+d._id['$numberLong']+".tgz";} ),
                 // For Plotting
                 "colors":d_.map( function(d) {return ZTFDATA[d.fid].color;}),
               }
@@ -54,13 +59,14 @@
       sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
     }
 
-    function prepare_plotly_data(transient, detections, upper_limits) {
+    function prepare_plotly_data(channel_config, transient, detections, upper_limits) {
       transient["ra"]  = Plotly.d3.min(detections.map( function(d) {return d.ra;}));
       transient["dec"] = Plotly.d3.min(detections.map( function(d) {return d.dec;}));
       $("#targetname").html(transient.ztfName);
       
-      var lcdata = get_plotly_data(detections);
+      var lcdata = get_plotly_data(detections, channel_config);
       var lclims = get_plotly_upperlimit(upper_limits);
+      // alert(detections[0]._id);
       create_plot(transient, lcdata, lclims);
 
       $("#tran-id").text(transient.tran_id);
@@ -88,6 +94,7 @@
           {
             x: lcdata.x,
             y: lcdata.y,
+            cutoutURL: lcdata.cutoutURL,
             error_y: {
               type: 'data',
               array: lcdata.dy,
@@ -181,6 +188,14 @@
 
 
         var plot = Plotly.newPlot(myDiv, data, layout, config);
+        var viewer = new FitsViewer();
+        if (lcdata.cutoutURL.length > 0) {
+          viewer.processFile(lcdata.cutoutURL[argMax(lcdata.x)]);
+        }
+        myDiv.on('plotly_click', function(data){
+            var point = data.points[0];
+            viewer.processFile(point.data.cutoutURL[point.pointNumber]);
+        });
       
     }
 
@@ -194,8 +209,8 @@
         $.getJSON(url+'/'+channel+'/channel.json',
           null,
           function (channel_config) {
-            load_transient_data(channel_config['baseURL'], targetName, prepare_plotly_data);
-          });
+            load_transient_data(channel_config, targetName, prepare_plotly_data);
+          })
       }
     );
 
@@ -232,9 +247,8 @@
     <main role="main" class="container-fluid" style="margin-top: 10">
       <div class="row">
         <div class="col-md-8 col-sm-12" id="lc_plot"> </div>
-
         <div class="col-md-push-9 col-md-3 col-sm-4"  style="margin-top: 30">
-
+              <div class="col-md-12 col-md-3 col-sm-4" id="FITSViewer"></div>
               <a id="sdsslink" target="_blank">
                 <div class="thumbnail">
                   <img id="sdssimg" class="img-fluid" alt="Responsive image">
