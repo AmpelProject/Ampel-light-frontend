@@ -25,7 +25,7 @@ function FitsViewer(input){
 	}
 	this.file = "";
 	this.stretches = ["linear","sqrt","cuberoot","log","loglog","sqrtlog"];
-	this.colors = ["grey","heat","A","B"];
+	this.colors = ["grey","viridis"];
 	// Check for support of various functions:
 	this.capability = { 
 		// the File API support
