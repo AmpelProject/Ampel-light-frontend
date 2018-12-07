@@ -360,12 +360,12 @@ function get_datatest () {
 
 function load_transient_data (baseURL, targetName, callback) {
   var transient = null;
-  //$.getJSON(baseURL+"/download?path=%2F"+targetName+"&files=transient.json",
-  $.getJSON(baseURL+"/transient.json",
+  $.getJSON(baseURL+"/download?path=%2F"+targetName+"&files=transient.json",
+  //$.getJSON(baseURL+"/transient.json",
     null,
     function (transient) { 
-      //$.getJSON(baseURL+"/download?path=%2F"+targetName+"&files=dump.json",
-      $.getJSON(baseURL+"/dump.json",
+      $.getJSON(baseURL+"/download?path=%2F"+targetName+"&files=dump.json",
+      //$.getJSON(baseURL+"/dump.json",
         null,
         function (dump) {
           transient["ztfName"] = get_ztfname(String(transient["tran_id"]));
