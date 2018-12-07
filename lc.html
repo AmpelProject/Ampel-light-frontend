@@ -64,12 +64,17 @@
       create_plot(transient, lcdata, lclims);
 
       $("#tran-id").text(transient.tran_id);
-      $("#comp-id").text(transient.latest_state.$binary)
+      $("#comp-id").text(transient.latest_state.$binary);
       $.each(transient.journal, function(k, v){
-        $("#t0-runs").append('<li id="run-item-' + k + '">' + JSON.stringify(v) + '</li>');
+        $("#t0-runs").append('<pre id="run-item-' + k + '">' + JSON.stringify(v, undefined, 2) + '</pre>');
         $("#t0-list").append('<a class="list-group-item list-group-item-action" href="#run-item-' + k + '">' + unixTimestampToDate(v.dt) + '</a>')
-      })
+      });
       //$("#t0-runs").text(JSON.transient.journal)
+
+      $('.list-group-item').on('click', function() {
+        console.log($($(this).attr("href")));
+        $($(this).attr("href")).addClass("font-weight-bold").siblings().removeClass("font-weight-bold");
+      });
     }
 
     function create_plot(transient, lcdata, lclims) {
@@ -189,7 +194,7 @@
           null,
           function (channel_config) {
             load_transient_data(channel_config['baseURL'], targetName, prepare_plotly_data);
-          })
+          });
       }
     );
 
@@ -266,7 +271,7 @@
           <div id="t0-list" class="list-group">
           </div>
         </div>
-        <div class="col-6 anyClass2">
+        <div class="col-6 anyClass2 text-left">
           <div data-spy="scroll" data-target="#run-list" data-offset=0>
             <ul id="t0-runs">
             </ul>
