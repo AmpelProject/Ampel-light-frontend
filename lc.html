@@ -70,7 +70,7 @@
       create_plot(transient, lcdata, lclims);
 
       $("#tran-id").text(transient.tran_id);
-      $("#comp-id").text(transient.latest_state.$binary);
+      $("#comp-id").text(b64toHex(transient.latest_state.$binary));
       $.each(transient.journal, function(k, v){
         var dt = v.dt;
         delete v.dt;
