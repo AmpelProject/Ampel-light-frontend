@@ -1,6 +1,6 @@
 color_map = [
     "list-group-item-danger",
-    "null",
+    "list-group-item-warning",
     "list-group-item-success",
 ]
 
