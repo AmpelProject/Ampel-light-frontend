@@ -28,3 +28,13 @@ function unixTimestampToDate(unix_timestamp) {
 function tierColor(json_obj) {
     return color_map[json_obj.tier];
 }
+
+function b64toHex(base64) {
+  var raw = atob(base64);
+  var hex = '';
+  for (i=0; i<raw.length; i++) {
+    var h = raw.charCodeAt(i).toString(16);
+    hex += (h.length == 2) ? h : '0'+h;
+  }
+  return hex;
+}
