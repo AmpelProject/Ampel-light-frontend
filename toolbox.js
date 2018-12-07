@@ -1,3 +1,9 @@
+color_map = [
+    "list-group-item-danger",
+    "null",
+    "list-group-item-success",
+]
+
 function julianIntToDate(n) {
     // convert a Julian number to a Gregorian Date.
     //    S.Boisseau / BubblingApp.com / 2014
@@ -25,4 +31,8 @@ function unixTimestampToDate(unix_timestamp) {
     var sec = ts.getSeconds() < 10 ? '0' + ts.getSeconds() : ts.getSeconds();
     var date = day + '.' + month + '.' + year + ' ' + hour + ':' + min + ':' + sec;
     return date;
+}
+
+function tierColor(json_obj) {
+    return color_map[json_obj.tier];
 }

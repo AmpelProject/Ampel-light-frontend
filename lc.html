@@ -67,12 +67,13 @@
       $("#comp-id").text(transient.latest_state.$binary);
       $.each(transient.journal, function(k, v){
         $("#t0-runs").append('<pre id="run-item-' + k + '">' + JSON.stringify(v, undefined, 2) + '</pre>');
-        $("#t0-list").append('<a class="list-group-item list-group-item-action" href="#run-item-' + k + '">' + unixTimestampToDate(v.dt) + '</a>')
+        $("#t0-list").append('<a class="list-group-item list-group-item-action ' + tierColor(v) + '" href="#run-item-' + k + '">' + unixTimestampToDate(v.dt) + '</a>')
       });
       //$("#t0-runs").text(JSON.transient.journal)
 
       $('.list-group-item').on('click', function() {
         console.log($($(this).attr("href")));
+        $(this).addClass("active").siblings().removeClass("active");
         $($(this).attr("href")).addClass("font-weight-bold").siblings().removeClass("font-weight-bold");
       });
     }
