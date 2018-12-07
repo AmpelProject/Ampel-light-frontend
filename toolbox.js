@@ -15,7 +15,7 @@ function argMax(array) {
 
 function unixTimestampToDate(unix_timestamp) {
     var ts = new Date(unix_timestamp * 1000);
-    var year = ts.getFullYear();
+    var year = ts.getFullYear().toString().substr(-2);
     var month = ts.getMonth() + 1;
     var day = ts.getDate();
     var hour = ts.getHours() < 10 ? '0' + ts.getHours() : ts.getHours();
