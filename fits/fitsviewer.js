@@ -60,10 +60,17 @@ function FitsViewer(input){
 var _fits_cache = {lru:[], data:{}};
 
 FitsViewer.prototype.processFile = function(file){
-	_viewer = this;
-	if (file == _viewer.src) {
+	if (file == this.src) {
 		return;
-	} else if (file in _fits_cache.data) {
+	}
+	_viewer = this;
+	// Move previous FITS into cache
+	for (var label in _viewer.fits) {
+		_fits_cache.data[_viewer.src][label] = _viewer.fits[label];
+	}
+	_viewer.src = file;
+	if (file in _fits_cache.data) {
+		// Move key to most recently used position
 		_fits_cache.lru.splice(_fits_cache.lru.indexOf(file), 1);
 		_fits_cache.lru.push(file);
 		for (var label in _fits_cache.data[file]) {
@@ -72,13 +79,13 @@ FitsViewer.prototype.processFile = function(file){
 		}
 		return;
 	} else {
+		// Clear out old images
 		while (_fits_cache.lru.length >= 32) {
 			delete _fits_cache.data[_fits_cache.lru.shift()];
 		}
 		_fits_cache.lru.push(file);
 		_fits_cache.data[file] = {};
 	}
-	_viewer.src = file;
 	TarGZ.stream(
 		file,
 		function (event) {
@@ -88,9 +95,6 @@ FitsViewer.prototype.processFile = function(file){
 			for (i=0; i < event.data.length; i++)
 				array[i] = event.data.codePointAt(i);
 			var label = event.filename.substring(0, event.filename.indexOf('.fits'));
-			if (label in _viewer.fits) {
-				_fits_cache.data[_viewer.src][label] = _viewer.fits[label];
-			}
 			_viewer.fits[label] = new FITS();
 			_fits = _viewer.fits[label];
 			var i = _fits.readFITSHeader(buffer);
