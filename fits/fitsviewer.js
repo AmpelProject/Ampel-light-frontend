@@ -19,10 +19,6 @@ function FitsViewer(input){
 	this.id = "FITSViewer";
 	this.canvas = "FITSimage";
 	this.fits = {};
-	var labels = ["difference", "science", "template"];
-	for (var i in labels) {
-		this.fits[labels[i]] = new FITS();
-	}
 	this.file = "";
 	this.stretches = ["sqrt","cuberoot","linear"];
 	this.colors = ["grey","viridis"];
@@ -42,20 +38,7 @@ function FitsViewer(input){
 	// Bind some events
 	for (var k in this.fits) {
 		_fits = this.fits[k];
-		_fits.bind("click",function(e){
-			e.y = this.height - e.y
-			//var value =this.image[e.y*this.width+e.x];
-			//document.getElementById('status').innerHTML ='click=('+ e.x+','+e.y+')='+value;
-		}).bind("mousemove",function(e){
-			e.y = this.height - e.y
-			//var value =this.image[e.y*this.width+e.x];
-			//document.getElementById('status').innerHTML ='move=('+ e.x+','+e.y+')='+value;
-		}).bind("load",function(e){
-			//document.getElementById('bitpix').innerHTML = this.header.BITPIX;
-			//document.getElementById('depth').innerHTML = this.depth;
-			//document.getElementById('z').value = 0;
-
-		}).bind("load",{me:this, key:k},function(e){
+		_fits.bind("load",{me:this, key:k},function(e){
 			var canvas = e.data.me.canvas + "_" + e.data.key;
 			console.log("loading "+canvas);
 			this.draw(canvas);
@@ -74,27 +57,45 @@ function FitsViewer(input){
   });
 }
 
+var _fits_cache = {lru:[], data:{}};
 
 FitsViewer.prototype.processFile = function(file){
 	_viewer = this;
+	if (file == _viewer.src) {
+		return;
+	} else if (file in _fits_cache.data) {
+		_fits_cache.lru.splice(_fits_cache.lru.indexOf(file), 1);
+		_fits_cache.lru.push(file);
+		for (var label in _fits_cache.data[file]) {
+			_viewer.fits[label] = _fits_cache.data[file][label];
+			_viewer.fits[label].draw(_viewer.canvas + "_" + label);
+		}
+		return;
+	} else {
+		while (_fits_cache.lru.length >= 32) {
+			delete _fits_cache.data[_fits_cache.lru.shift()];
+		}
+		_fits_cache.lru.push(file);
+		_fits_cache.data[file] = {};
+	}
 	_viewer.src = file;
-	console.log("processFile");
 	TarGZ.stream(
 		file,
 		function (event) {
-			console.log(event);
 			var buffer = new ArrayBuffer(event.data.length);
 			var array = new Uint8Array(buffer);
 			
 			for (i=0; i < event.data.length; i++)
 				array[i] = event.data.codePointAt(i);
-			var ext = event.filename.indexOf('.fits');
-			console.log(event.filename.substring(0, ext));
-			_fits = _viewer.fits[event.filename.substring(0, ext)];
+			var label = event.filename.substring(0, event.filename.indexOf('.fits'));
+			if (label in _viewer.fits) {
+				_fits_cache.data[_viewer.src][label] = _viewer.fits[label];
+			}
+			_viewer.fits[label] = new FITS();
+			_fits = _viewer.fits[label];
 			var i = _fits.readFITSHeader(buffer);
 			if(_fits.header.NAXIS >= 2) success = _fits.readFITSImage(buffer,2880);
-			console.log(_fits);
-			_fits.triggerEvent("load")
+			_fits.draw(_viewer.canvas + "_" + label);
 		},
 		function(xhr) {
 			console.log("finished "+_viewer.src);

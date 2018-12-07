@@ -20,53 +20,6 @@ function FITS(input){
 	this.data = {load:"",click:"",mousemove:""};	// Let's define some event data
 }
 
-// Loads the FITS file using an ajax request. To call your own function after
-// the FITS file is loaded, you should either provide a callback directly or have
-// already set the load function.
-FITS.prototype.load = function(source,fnCallback){
-	if(typeof source=="string") this.src = source;
-	if(typeof this.src=="string"){
-		this.image = null
-		var _obj = this;
-		if(typeof fnCallback=="function") _obj.bind("load",fnCallback)
-		if (this.src.endsWith(".fits")) {
-			var req = new XMLHttpRequest();
-			req.open("GET", this.src, true);
-			req.responseType = "arraybuffer";
-			req.onload = function (event) {
-				var i = _obj.readFITSHeader(req.response);
-				if(_obj.header.NAXIS >= 2) success = _obj.readFITSImage(req.response,2880);
-				_obj.triggerEvent("load")
-			};
-			req.send(null);
-		} else if (this.src.endsWith(".tgz")) {
-			console.log("streaming");
-			TarGZ.stream(
-				this.src,
-				function (event) {
-					console.log(event);
-					var buffer = new ArrayBuffer(event.data.length);
-					var array = new Uint8Array(buffer);
-					for (i=0; i < event.data.length; i++)
-						array[i] = event.data.codePointAt(i);
-					// console.log(event.toDataURL()t);
-					var i = _obj.readFITSHeader(buffer);
-					if(_obj.header.NAXIS >= 2) success = _obj.readFITSImage(buffer,2880);
-					_obj.triggerEvent("load")
-				},
-				function(xhr) {
-					console.log("finished "+_obj.src);
-				},
-				function(event) {
-					console.log("failed to load "+_obj.src);
-					console.log(event);
-				}
-			);
-		}
-	}
-	return this;
-}
-
 // Parse the ASCII header from the FITS file. It should be at the start.
 FITS.prototype.readFITSHeader = function(buffer){
 	var iLength = buffer.byteLength;
@@ -109,7 +62,6 @@ FITS.prototype.readFITSHeader = function(buffer){
 	if(typeof this.header.BSCALE=="undefined") this.header.BSCALE = 1;
 	if(typeof this.header.BZERO=="undefined") this.header.BZERO = 0;
 
-	console.log(this.header);
 	return iOffset;
 }
 
@@ -117,7 +69,6 @@ FITS.prototype.readFITSHeader = function(buffer){
 FITS.prototype.readFITSImage = function(buffer,iOffset){
 	var view = new DataView(buffer, iOffset);
 	var iLength = view.byteLength;
-	console.log(iLength);
 	var i = 0;
 	this.z = 0;
 	this.image = new Array(this.width*this.height*this.depth);
@@ -148,11 +99,6 @@ FITS.prototype.readFITSImage = function(buffer,iOffset){
 		while (i < length){
 			val = view.getFloat32(i,false);
 			if (val < 0) val = -val;
-			if (p < 4) {
-/*				console.log(val);*/
-
-				console.log({int: view.getUint32(i,false), hex: "0x"+view.getUint32(i,false).toString(16), offset:i+iOffset});
-			}
 			this.image[p++] = val*this.header.BSCALE + this.header.BZERO;
 
 			i += 4;
