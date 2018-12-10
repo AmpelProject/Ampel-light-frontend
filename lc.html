@@ -7,6 +7,8 @@
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="cutout-zoom.css">
+  
   <style>
     .anyClass {
   height:280px;
@@ -263,15 +265,15 @@
         <div class="col-md-7 col-sm-12" id="lc_plot"> </div>
         <div class="col-md-1 col-md-1 col-sm-1 text-center" id="FITSViewer" style="margin-top: 30">
           <div class="thumbnail">
-            <canvas id="FITSimage_difference" class="img-responsive" alt="difference image"></canvas>
+            <canvas id="FITSimage_difference" class="img-responsive ztf-cutout" alt="difference image"></canvas>
           </div>
           <div class="clearfix"></div>
           <div class="thumbnail">
-            <canvas id="FITSimage_science" class="img-responsive" alt="science image" style="margin-top: 10"></canvas>
+            <canvas id="FITSimage_science" class="img-responsive ztf-cutout" alt="science image" style="margin-top: 10"></canvas>
           </div>
           <div class="clearfix"></div>
           <div class="thumbnail">
-            <canvas id="FITSimage_template" class="img-responsive" alt="reference image"  style="margin-top: 10"></canvas>
+            <canvas id="FITSimage_template" class="img-responsive ztf-cutout" alt="reference image"  style="margin-top: 10"></canvas>
           </div>
         </div>
         
