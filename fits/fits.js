@@ -238,7 +238,7 @@ FITS.prototype.update = function(inp){
 	var i=0;
 	for (row=0;row<this.height; row++){
 		for (col=0;col<this.width;col++){
-			pos = ((this.height-row)*this.width+col)*4
+			pos = (row*this.width+col)*4
 			c = this.colorImage(image[i],this.color);
 			//if(i < 3) console.log(c,image[i])
 			imageData.data[pos] = c.r;
