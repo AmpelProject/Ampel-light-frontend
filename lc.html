@@ -203,11 +203,26 @@
         var plot = Plotly.newPlot(myDiv, data, layout, config);
         var viewer = new FitsViewer();
         if (lcdata.cutoutURL.length > 0) {
-          viewer.processFile(lcdata.cutoutURL[argMax(lcdata.x)]);
+          viewer.processFile(lcdata.cutoutURL[argMax(lcdata.x)],
+            function(event) {
+              alert("No alert issued for candid "+point.data.text[point.pointNumber])
+            },
+            function(event) {}
+          );
         }
         myDiv.on('plotly_click', function(data){
-            var point = data.points[0];
-            viewer.processFile(point.data.cutoutURL[point.pointNumber]);
+          for (var i in data.points) {
+            if (data.points[i].curveNumber == 0) {
+              var point = data.points[i];
+              viewer.processFile(point.data.cutoutURL[point.pointNumber],
+                function(event) {
+                  alert("No alert issued for candid "+point.data.text[point.pointNumber])
+                },
+                function(event) {}
+              );
+              break;
+            }
+          }
         });
       
     }

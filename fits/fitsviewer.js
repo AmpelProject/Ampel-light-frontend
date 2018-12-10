@@ -59,7 +59,7 @@ function FitsViewer(input){
 
 var _fits_cache = {lru:[], data:{}};
 
-FitsViewer.prototype.processFile = function(file){
+FitsViewer.prototype.processFile = function(file, onError=null, onComplete=null){
 	if (file == this.src) {
 		return;
 	}
@@ -101,10 +101,10 @@ FitsViewer.prototype.processFile = function(file){
 			if(_fits.header.NAXIS >= 2) success = _fits.readFITSImage(buffer,2880);
 			_fits.draw(_viewer.canvas + "_" + label);
 		},
-		function(xhr) {
+		onComplete || function(xhr) {
 			console.log("finished "+_viewer.src);
 		},
-		function(event) {
+		onError || function(event) {
 			console.log("failed to load "+_viewer.src);
 			console.log(event);
 		}
