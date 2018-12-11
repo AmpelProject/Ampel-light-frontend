@@ -238,8 +238,9 @@
         url = url.substr(0, url.lastIndexOf('/'));
         $.getJSON(url+'/'+channel+'/channel.json',
           null,
-          function (channel_config) {
-            load_transient_data(channel_config, targetName, prepare_plotly_data);
+          function (channelConfig) {
+            load_transient_data(channelConfig, targetName, prepare_plotly_data);
+            document.getElementById("downloadlink").setAttribute("href", channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json");
           })
       }
     );
@@ -252,7 +253,7 @@
     <ul class="navbar-nav">
 
       <li class="nav-item active">
-        <a id="marshallink" class="btn btn-outline-light btn-md" role="button" aria-pressed="true" style="margin-top: 5px"><i class="fa fa-download"></i></a>
+        <a id="downloadlink" class="btn btn-outline-light btn-md" role="button" aria-pressed="true" style="margin-top: 5px"><i class="fa fa-download"></i></a>
       </li>
 
       <li class="nav-item active">
