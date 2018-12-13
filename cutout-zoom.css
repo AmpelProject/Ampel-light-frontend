@@ -11,6 +11,4 @@ canvas, img {
 canvas.ztf-cutout {
     width: 126px;
     height: 126px;
-    position: relative;
-    right: 63px;
 }

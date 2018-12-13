@@ -56,16 +56,16 @@
 
     function load_sdss_image(transient) {
       document.getElementById("sdsslink").setAttribute("href", "http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra="+transient.ra+"&dec="+transient.dec+"&scale=0.1981");
-      document.getElementById("marshallink").setAttribute("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+transient.tran_names[0]);
       var sdssimg = document.getElementById("sdssimg");
-      sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
+      sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.5&width="+126+"&height="+126+"&opt=G&query=&Grid=on");
     }
 
     function prepare_plotly_data(channel_config, transientSummary, transientView) {
       transientSummary["ra"]  = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.ra;}));
       transientSummary["dec"] = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.dec;}));
       transientSummary["tran_names"] = transientView["tran_names"]
-      $("#targetname").html(transientSummary["tran_names"][0]);
+      var ztfName = transientSummary["tran_names"][0]
+      $("#targetname").html(ztfName).attr("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+ztfName);
       for (var i=1; i<transientSummary.tran_names.length; i++) {
         if (transientSummary.tran_names[i].startsWith("TNS")) {
           var name = transientSummary.tran_names[i].substr(3);
@@ -291,33 +291,41 @@
   <wrapper class="d-flex flex-column">
     <main role="main" class="container-fluid" style="margin-top: 10">
       <div class="row">
-        <div class="col-md-7 col-sm-12" id="lc_plot"> </div>
-        <div class="col-md-1 col-md-1 col-sm-1 text-center" id="FITSViewer" style="margin-top: 30">
-          <div class="thumbnail">
-            <canvas id="FITSimage_difference" class="img-responsive ztf-cutout" alt="difference image"></canvas>
+        <div class="col-md-8 col-sm-11" id="lc_plot"> </div>
+        <div class="col-md-4 col-sm-1 text-center" id="FITSViewer" style="margin-top: 30">
+          <div class="row">
+            <div class="thumbnail col-md-6 col-sm-6">
+              <canvas id="FITSimage_difference" class="img-responsive ztf-cutout" alt="difference image"></canvas>
+            </div>
+            <div class="thumbnail col-md-6 col-sm-6">
+              <canvas id="FITSimage_science" class="img-responsive ztf-cutout" alt="science image"></canvas>
+            </div>
           </div>
-          <div class="clearfix"></div>
-          <div class="thumbnail">
-            <canvas id="FITSimage_science" class="img-responsive ztf-cutout" alt="science image" style="margin-top: 10"></canvas>
-          </div>
-          <div class="clearfix"></div>
-          <div class="thumbnail">
-            <canvas id="FITSimage_template" class="img-responsive ztf-cutout" alt="reference image"  style="margin-top: 10"></canvas>
+          
+          <div class="row" style="margin-top: 10">
+            <div class="thumbnail col-md-6 col-sm-6">
+              <canvas id="FITSimage_template" class="img-responsive ztf-cutout" alt="reference image"></canvas>
+            </div>
+            <div class="thumbnail col-md-6 col-sm-6">
+                <a id="sdsslink" target="_blank">
+                
+                <img id="sdssimg" class="img-responsive ztf-cutout" alt="Responsive image">
+                </a>
+                
+              </div>
           </div>
         </div>
         
-        <div class="col-md-push-8 col-md-3 col-sm-4"  style="margin-top: 30">
-              <a id="sdsslink" target="_blank">
-                <div class="thumbnail">
-                  <img id="sdssimg" class="img-fluid" alt="Responsive image">
-                </div>
-              </a>
+
+        
+        <!-- <div class="col-md-push-8 col-md-3 col-sm-4"  style="margin-top: 30">
+
               <div class="row">
                 <div class="col-12"  style="margin-top: 10">
                   <a id="marshallink" class="btn btn-outline-dark btn-md btn-block" role="button" aria-pressed="true">Access the marshal</a>
                 </div>
               </div>
-        </div>
+        </div> -->
       </div>
       <div class="row">
         <div class="col-12"><hr size="50"></div>
