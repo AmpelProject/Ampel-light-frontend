@@ -56,7 +56,7 @@
 
     function load_sdss_image(transient) {
       document.getElementById("sdsslink").setAttribute("href", "http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra="+transient.ra+"&dec="+transient.dec+"&scale=0.1981");
-      document.getElementById("marshallink").setAttribute("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+transient.ztfName);
+      document.getElementById("marshallink").setAttribute("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+transient.tran_names[0]);
       var sdssimg = document.getElementById("sdssimg");
       sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.25&width="+sdssimg.parentElement.clientWidth+"&height="+sdssimg.parentElement.clientWidth+"&opt=G&query=&Grid=on");
     }
@@ -64,7 +64,15 @@
     function prepare_plotly_data(channel_config, transientSummary, transientView) {
       transientSummary["ra"]  = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.ra;}));
       transientSummary["dec"] = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.dec;}));
-      $("#targetname").html(transientSummary.ztfName);
+      transientSummary["tran_names"] = transientView["tran_names"]
+      $("#targetname").html(transientSummary["tran_names"][0]);
+      for (var i=1; i<transientSummary.tran_names.length; i++) {
+        if (transientSummary.tran_names[i].startsWith("TNS")) {
+          var name = transientSummary.tran_names[i].substr(3);
+          $("#tnsname").text("TNS:"+name).attr("href", "https://wis-tns.weizmann.ac.il/object/"+name);
+          break;
+        }
+      }
       
       var lcdata = get_plotly_data(transientView.photopoints, channel_config);
       var lclims = get_plotly_upperlimit(transientView.upperlimits);
@@ -258,6 +266,10 @@
 
       <li class="nav-item active">
         <a class="nav-link" id="targetname"></a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" id="tnsname"></a>
       </li>
 
       <li class="nav-item">

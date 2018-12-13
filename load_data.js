@@ -366,7 +366,6 @@ function load_transient_data (channelConfig, targetName, callback) {
       $.getJSON(channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json",
         null,
         function (transientView) {
-          transientSummary["ztfName"] = get_ztfname(String(transientSummary["tran_id"]));
           callback(channelConfig, transientSummary, transientView);
         })
     });
