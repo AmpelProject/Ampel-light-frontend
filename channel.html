@@ -50,8 +50,10 @@
         $.getJSON(url+'/'+channel+'/channel.json',
           null,
           function (channelConfig) {
+            const summaryURL = channelConfig.baseURL+"/download?path=%2F&files=channel-summary-"+night+".json";
+            $('#downloadlink').attr("href", summaryURL);
             $.getJSON(
-              channelConfig.baseURL+"/download?path=%2F&files=channel-summary-"+night+".json",
+              summaryURL,
               null,
               function(channelSummary) {
                 var fields = Object.keys(channelSummary[Object.keys(channelSummary)[0]]);
@@ -79,12 +81,12 @@
                 $(".clickable-row").click(function() {
                     window.location = $(this).data("href");
                 });
-                // $("#channelsummary").on('click-row.bs.table', function (e, row, $element) {
-                //     window.location = $element.data('href');
-                // });
-                console.log(Object.keys(channelSummary))
+              }).fail(function() {
+                alert('No '+channel+' summary for night '+night);
               })
             
+          }).fail(function() {
+            alert('Unknown channel '+channel);
           })
       }
     );
