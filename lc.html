@@ -33,13 +33,20 @@
   <script src="fits/fitsviewer.js"></script>
 
   <script>
+    function get_stamp_url(pp, channel_config) {
+      if (pp.content.alFlags.includes(23)) {
+        return channel_config.cutouts.public+"/download?files="+pp.content._id['$numberLong']+".tgz";
+      } else if (pp.content.alFlags.includes(22)) {
+        return channel_config.cutouts.partnership+"/download?files="+pp.content._id['$numberLong']+".tgz";
+      }
+    }
     function get_plotly_data(d_, channel_config) {
         return {"x": d_.map( function(d) {return julianDateToDate(d.content.jd);} ),
                 "y": d_.map( function(d) {return d.content.magpsf;} ),
                 "dy": d_.map( function(d) {return d.content.sigmapsf;} ),
                 "fid":d_.map( function(d) {return d.content.fid;}),
                 "id":d_.map( function(d) {return d.content._id['$numberLong'];}),
-                "cutoutURL":d_.map( function(d) { return channel_config.cutouts.public+"/download?files="+d.content._id['$numberLong']+".tgz";} ),
+                "cutoutURL":d_.map( function(d) { return get_stamp_url(d, channel_config); } ),
                 // For Plotting
                 "colors":d_.map( function(d) {return ZTFDATA[d.content.fid].color;}),
               }
