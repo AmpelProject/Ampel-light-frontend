@@ -32,16 +32,27 @@
 
 
   <script>
-
+    function ztfNightFromDate(d) {
+      return d.getFullYear().toString()+(d.getMonth()+1).toString()+d.getDate().toString();
+    }
+    function ztfNightToDate(d) {
+      return new Date(parseInt(d.substr(0,4),10), parseInt(d.substr(4,2),10)-1, parseInt(d.substr(6,2),10),16,0,0);
+    }
     $(document).ready(
       function() {
         const urlParams = new URLSearchParams(window.location.search);
         var night = urlParams.get('night');
         if (night == null) {
-          var d = new Date(Date.now()-86400000);
-          night = d.getFullYear().toString()+(d.getMonth()+1).toString()+d.getDate().toString();
+          night = ztfNightFromDate(new Date(Date.now()-86400000));
         }
         const channel = urlParams.get('channel');
+        {
+          var next = new Date(ztfNightToDate(night).getTime()+86400000);
+          if (next.getTime() < Date.now()) {
+            $('#next-night-link').attr('href', 'channel.html?channel='+channel+'&night='+ztfNightFromDate(next));
+          }
+          $('#prev-night-link').attr('href', 'channel.html?channel='+channel+'&night='+ztfNightFromDate(new Date(ztfNightToDate(night).getTime()-86400000)));
+        }
         $("#channelname").html(channel);
         $("#night").html(night);
         $("#channelname-form").attr('value',channel);
@@ -107,7 +118,15 @@
       </li>
 
       <li class="nav-item active">
+        <a class="nav-link" id="prev-night-link" role="button"  aria-pressed="true" style="margin-top: 5px"><i class="fa fa-chevron-left"></i></a>
+      </li>
+
+      <li class="nav-item active">
         <a class="nav-link" id="night"></a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" id="next-night-link" role="button"  aria-pressed="true" style="margin-top: 5px"><i class="fa fa-chevron-right"></i></a>
       </li>
 
       <li class="nav-item">
