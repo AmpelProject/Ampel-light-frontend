@@ -1,0 +1,162 @@
+<body>
+
+<head>
+  <!-- Plotly.js -->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  <script type="text/javascript" src="tablesorter-master/js/jquery.tablesorter.js"></script>
+  <script type="text/javascript" src="tablesorter-master/js/jquery.tablesorter.widgets.js"></script>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="cutout-zoom.css">
+  
+  <style>
+    .anyClass {
+  height:280px;
+  overflow-y: scroll;
+}
+.anyClass2 {
+  height:280px;
+  overflow-y: scroll;
+  font-size: 18px;
+}
+
+  </style>
+
+  <script src="config.js"></script>
+
+  <script src="load_data.js"></script>
+
+  <script src="toolbox.js"></script>
+
+
+  <script>
+
+    $(document).ready(
+      function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        var night = urlParams.get('night');
+        if (night == null) {
+          var d = new Date(Date.now()-86400000);
+          night = d.getFullYear().toString()+(d.getMonth()+1).toString()+d.getDate().toString();
+        }
+        const channel = urlParams.get('channel');
+        $("#channelname").html(channel);
+        $("#night").html(night);
+        $("#channelname-form").attr('value',channel);
+        var url = window.location.href.substr(0, window.location.href.lastIndexOf('?'));
+        url = url.substr(0, url.lastIndexOf('/'));
+        $.getJSON(url+'/'+channel+'/channel.json',
+          null,
+          function (channelConfig) {
+            $.getJSON(
+              channelConfig.baseURL+"/download?path=%2F&files=channel-summary-"+night+".json",
+              null,
+              function(channelSummary) {
+                var fields = Object.keys(channelSummary[Object.keys(channelSummary)[0]]);
+                var row = $('<tr>');
+                row.append($('<th>'))
+                for (i in fields) {
+                  row.append($('<th>').text(fields[i]))
+                }
+                $("#channelsummary").append($('<thead>').append(row));
+                var tbody = $("#channelsummary").append($('<tbody>'));
+                for (ztfName in channelSummary) {
+                  item = channelSummary[ztfName]
+                  var row = $('<tr>');
+                  row.append($('<td>').text(ztfName));
+                  for (i in fields) {
+                    row.append($('<td>').text(item[fields[i]]));
+                  }
+                  row.attr("class", "clickable-row").attr("data-href", "lc.html?target="+ztfName+"&channel="+channel+"#")
+                  tbody.append(row);
+                }
+                $("#channelsummary").tablesorter({
+                  sortList: [[0,0]],
+                  headers: {3:{sorter:false}}
+                });
+                $(".clickable-row").click(function() {
+                    window.location = $(this).data("href");
+                });
+                // $("#channelsummary").on('click-row.bs.table', function (e, row, $element) {
+                //     window.location = $element.data('href');
+                // });
+                console.log(Object.keys(channelSummary))
+              })
+            
+          })
+      }
+    );
+
+  </script>
+
+</head>
+
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <ul class="navbar-nav">
+
+      <li class="nav-item active">
+        <a id="downloadlink" class="btn btn-outline-light btn-md" role="button" aria-pressed="true" style="margin-top: 5px"><i class="fa fa-download"></i></a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" id="targetname"></a>
+      </li>
+
+      <li class="nav-item active">
+        <a class="nav-link" id="night"></a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" id="channelname" href="#">Channel</a>
+      </li>
+    </ul>
+
+    <form class="form-inline my-2 my-lg-0  ml-auto", method="GET">
+        <input class="form-control mr-sm-2" type="search" id="target" name="target", placeholder="Target Name" aria-label="Search">
+        <input type="hidden" id="channelname-form" name="channel">
+    </form>
+
+  </nav>
+
+
+
+
+  <wrapper class="d-flex flex-column">
+    <main role="main" class="container-fluid" style="margin-top: 10">
+      
+      <div class="row text-center text-middle">
+        <div class="col-4">
+          <table class="table table-hover" id="channelsummary">
+            <colgroup>
+              <col class="bg-light"></col>
+            </colgroup>
+          </table>
+        </div>
+      </div>
+
+  </main>
+  <footer class="footer fixed-bottom text-center bg-light border-top">
+    <nav class="navbar navbar-expand-sm bg-light py-0 navbar-light" style="font-size:15px">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link">Ampel</a>
+        </li>
+        <li class="nav-item">
+          <div class="nav-link"> | </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mailto:ampel-info@desy.de">Contact us</a>
+        </li>
+      </ul>
+
+      <form class="form-inline my-2 my-lg-0  ml-auto">
+          <a class="nav-link fa" style="color:black;font-size:24px" href="https://github.com/AmpelProject" target="_blank"> &#xf09b; </a>
+      </form>
+    </nav>
+
+  </footer>
+  </wrapper>
+
+</body>
