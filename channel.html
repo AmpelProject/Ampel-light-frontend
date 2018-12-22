@@ -38,6 +38,38 @@
     function ztfNightToDate(d) {
       return new Date(parseInt(d.substr(0,4),10), parseInt(d.substr(4,2),10)-1, parseInt(d.substr(6,2),10),16,0,0);
     }
+    function format_jd(jd) {
+      const seconds = (Date.now() - julianDateToDate(jd))/1000;
+      if (seconds > 86400) {
+        return Math.round(seconds/86400).toString()+' days ago';
+      } else if (seconds > 3600) {
+        return Math.round(seconds/3600).toString()+' hours ago';
+      } else if (seconds > 60) {
+        return Math.round(seconds/60).toString()+' minutes ago';
+      } else {
+        return Math.round(seconds)+' seconds ago';
+      }
+    }
+    function format_field(name, value) {
+      if (name.endsWith('_detection')) {
+        return format_jd(value);
+      } else if (Number.isInteger(value)) {
+        return value;
+      } else if (!isNaN(parseFloat(value)) && isFinite(value)) {
+        return parseFloat(value).toFixed(2);
+      } else {
+        return value;
+      }
+    }
+    const field_names = {
+      tns_names: 'TNS',
+      ra:        'RA',
+      dec:       'Dec',
+      rb:        'R/B',
+      first_detection: 'First detection',
+      last_detection: 'Last detection',
+      detections: 'Num. detections'
+    }
     $(document).ready(
       function() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -71,7 +103,7 @@
                 var row = $('<tr>');
                 row.append($('<th>'))
                 for (i in fields) {
-                  row.append($('<th>').text(fields[i]))
+                  row.append($('<th>').text((fields[i] in field_names) ? field_names[fields[i]] : fields[i]))
                 }
                 $("#channelsummary").append($('<thead>').append(row));
                 var tbody = $("#channelsummary").append($('<tbody>'));
@@ -80,7 +112,7 @@
                   var row = $('<tr>');
                   row.append($('<td>').text(ztfName));
                   for (i in fields) {
-                    row.append($('<td>').text(item[fields[i]]));
+                    row.append($('<td>').text(format_field(fields[i], item[fields[i]])));
                   }
                   row.attr("class", "clickable-row").attr("data-href", "lc.html?target="+ztfName+"&channel="+channel+"#")
                   tbody.append(row);
