@@ -10,106 +10,142 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="cutout-zoom.css">
   
-  <style>
-    .anyClass {
-  height:280px;
-  overflow-y: scroll;
+<style>
+.anyClass {
+	height:280px;
+	overflow-y: scroll;
 }
 .anyClass2 {
-  height:280px;
-  overflow-y: scroll;
-  font-size: 18px;
+	height:280px;
+	overflow-y: scroll;
+	font-size: 18px;
 }
 
-  </style>
+</style>
 
-  <script src="config.js"></script>
+<script src="config.js"></script>
 
-  <script src="load_data.js"></script>
+<script src="load_data.js"></script>
 
-  <script src="toolbox.js"></script>
+<script src="toolbox.js"></script>
 
-  <script src="fits/gzip.js"></script>
-  <script src="fits/fits.js"></script>
-  <script src="fits/fitsviewer.js"></script>
+<script src="fits/gzip.js"></script>
+<script src="fits/fits.js"></script>
+<script src="fits/fitsviewer.js"></script>
 
-  <script>
+<script>
+
     function get_stamp_url(pp, channel_config) {
-      if (pp.content.alFlags.includes(23)) {
-        return channel_config.cutouts.public+"/download?files="+pp.content._id['$numberLong']+".tgz";
-      } else if (pp.content.alFlags.includes(22)) {
-        return channel_config.cutouts.partnership+"/download?files="+pp.content._id['$numberLong']+".tgz";
-      }
-    }
+		if (pp.content.alFlags.includes(23)) {
+			return channel_config.cutouts.public+"/download?files="+pp.content._id['$numberLong']+".tgz";
+		} else if (pp.content.alFlags.includes(22)) {
+			return channel_config.cutouts.partnership+"/download?files="+pp.content._id['$numberLong']+".tgz";
+		}
+	}
+
     function get_plotly_data(d_, channel_config) {
-        return {"x": d_.map( function(d) {return julianDateToDate(d.content.jd);} ),
-                "y": d_.map( function(d) {return d.content.magpsf;} ),
-                "dy": d_.map( function(d) {return d.content.sigmapsf;} ),
-                "fid":d_.map( function(d) {return d.content.fid;}),
-                "id":d_.map( function(d) {return d.content._id['$numberLong'];}),
-                "cutoutURL":d_.map( function(d) { return get_stamp_url(d, channel_config); } ),
-                // For Plotting
-                "colors":d_.map( function(d) {return ZTFDATA[d.content.fid].color;}),
-              }
-      };
+        return {
+			"x": d_.map(function(d) {return julianDateToDate(d.content.jd);}),
+			"y": d_.map(function(d) {return d.content.magpsf;}),
+			"dy": d_.map(function(d) {return d.content.sigmapsf;}),
+			"fid": d_.map(function(d) {return d.content.fid;}),
+			"id": d_.map(function(d) {return d.content._id['$numberLong'];}),
+			"cutoutURL": d_.map(function(d) { return get_stamp_url(d, channel_config);}),
+			// For Plotting
+			"colors":d_.map(function(d) {return ZTFDATA[d.content.fid].color;})
+		}
+	};
 
     function get_plotly_upperlimit(d_) {
-        return {"x": d_.map( function(d) {return julianDateToDate(d.content.jd);} ),
-                "y": d_.map( function(d) {return d.content.diffmaglim;} ),
-                "fid":d_.map( function(d) {return d.content.fid;} ),
-                // For Plotting
-                "colors":d_.map( function(d) {return ZTFDATA[d.content.fid].color;}),
-              }
+        return {
+			"x": d_.map(function(d) {return julianDateToDate(d.content.jd);}),
+			"y": d_.map(function(d) {return d.content.diffmaglim;}),
+			"fid":d_.map(function(d) {return d.content.fid;}),
+			// For Plotting
+			"colors":d_.map(function(d) {return ZTFDATA[d.content.fid].color;}),
+		}
     };
 
     function load_sdss_image(transient) {
-      document.getElementById("sdsslink").setAttribute("href", "http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra="+transient.ra+"&dec="+transient.dec+"&scale=0.1981");
-      var sdssimg = document.getElementById("sdssimg");
-      sdssimg.setAttribute("src", "http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra="+transient.ra+"&dec="+transient.dec+"&scale=0.5&width="+126+"&height="+126+"&opt=G&query=&Grid=on");
-    }
+
+		document.getElementById("sdsslink").setAttribute(
+			"href", 
+			"http://skyserver.sdss.org/dr14/en/tools/chart/navi.aspx?opt=G&ra=" +
+			transient.ra + "&dec=" + transient.dec + "&scale=0.1981"
+		);
+
+		document.getElementById("sdssimg").setAttribute(
+			"src", 
+			"http://skyservice.pha.jhu.edu/DR14/ImgCutout/getjpeg.aspx?ra=" + 
+			transient.ra + "&dec=" + transient.dec + 
+			"&scale=0.5&width=126&height=126&opt=G&query=&Grid=on"
+		);
+	}
 
     function prepare_plotly_data(channel_config, transientSummary, transientView) {
-      transientSummary["ra"]  = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.ra;}));
-      transientSummary["dec"] = Plotly.d3.min(transientView.photopoints.map( function(d) {return d.content.dec;}));
-      transientSummary["tran_names"] = transientView["tran_names"]
-      var ztfName = transientSummary["tran_names"][0]
-      $("#targetname").html(ztfName).attr("href", "http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+ztfName);
-      for (var i=1; i<transientSummary.tran_names.length; i++) {
-        if (transientSummary.tran_names[i].startsWith("TNS")) {
-          var name = transientSummary.tran_names[i].substr(3);
-          $("#tnsname").text("TNS:"+name).attr("href", "https://wis-tns.weizmann.ac.il/object/"+name);
-          break;
-        }
-      }
+
+		transientSummary["ra"]  = Plotly.d3.min(
+			transientView.photopoints.map(
+				  function(d) {return d.content.ra;}
+			)
+	  	);
+		transientSummary["dec"] = Plotly.d3.min(
+			transientView.photopoints.map(
+				function(d) {return d.content.dec;}
+			)
+		);
+		transientSummary["tran_names"] = transientView["tran_names"]
+		var ztfName = transientSummary["tran_names"][0]
+
+		$("#targetname").html(ztfName).attr(
+			"href", 
+			"http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+ztfName
+		);
+
+		for (var i=1; i<transientSummary.tran_names.length; i++) {
+			if (transientSummary.tran_names[i].startsWith("TNS")) {
+				var name = transientSummary.tran_names[i].substr(3);
+				$("#tnsname").text("TNS:"+name).attr("href", "https://wis-tns.weizmann.ac.il/object/"+name);
+				break;
+			}
+		}
       
-      var lcdata = get_plotly_data(transientView.photopoints, channel_config);
-      var lclims = get_plotly_upperlimit(transientView.upperlimits);
-      // alert(detections[0]._id);
-      create_plot(transientSummary, lcdata, lclims);
+		var lcdata = get_plotly_data(transientView.photopoints, channel_config);
+		var lclims = get_plotly_upperlimit(transientView.upperlimits);
 
-      // $("#tran-id").text(transientSummary.tran_id);
-      // $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
-      $.each(transientSummary.journal, function(k, v){
-        var dt = v.dt;
-        delete v.dt;
-        $("#t0-runs").append(
-          '<pre id="run-item-' + k + '" style="text-align: center">' +
-          '<div style="text-align: left; display: inline-block;">' + 
-          JSON.stringify(v, undefined, 2) + 
-          '</div></pre>'
-        );
-        $("#t0-list").append(
-          '<a class="list-group-item list-group-item-action ' + tierColor(v) + 
-          '" href="#run-item-' + k + '">' + unixTimestampToDate(dt) + '</a>'
-        )
-      });
-      //$("#t0-runs").text(JSON.transient.journal)
+		// alert(detections[0]._id);
+		create_plot(transientSummary, lcdata, lclims);
 
-      $('.list-group-item').on('click', function() {
-        console.log($($(this).attr("href")));
-        $(this).addClass("active").siblings().removeClass("active");
-        $($(this).attr("href")).addClass("font-weight-bold").siblings().removeClass("font-weight-bold");
-      });
+		// $("#tran-id").text(transientSummary.tran_id);
+		// $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
+		$.each(
+			transientSummary.journal, 
+			function(k, v) {
+				var dt = v.dt;
+				delete v.dt;
+				$("#t0-runs").append(
+					'<pre id="run-item-' + k + '" style="text-align: center">' +
+					'<div style="text-align: left; display: inline-block;">' + 
+					JSON.stringify(v, undefined, 2) + 
+					'</div></pre>'
+				);
+				$("#t0-list").append(
+					'<a class="list-group-item list-group-item-action ' + tierColor(v) + 
+					'" href="#run-item-' + k + '">' + unixTimestampToDate(dt) + '</a>'
+			)
+			}
+		);
+	
+		//$("#t0-runs").text(JSON.transient.journal)
+
+		$('.list-group-item').on(
+			'click', 
+			function() {
+				console.log($($(this).attr("href")));
+				$(this).addClass("active").siblings().removeClass("active");
+				$($(this).attr("href")).addClass("font-weight-bold").siblings().removeClass("font-weight-bold");
+			}
+		);
     }
 
     function create_plot(transientSummary, lcdata, lclims) {
@@ -245,24 +281,28 @@
     }
 
     $(document).ready(
-      function() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const targetName = urlParams.get('target');
-        const channel = urlParams.get('channel');
-        $("#channelname").html(channel);
-        $("#channelname-form").attr('value',channel);
-        var url = window.location.href.substr(0, window.location.href.lastIndexOf('?'));
-        url = url.substr(0, url.lastIndexOf('/'));
-        $.getJSON(url+'/'+channel+'/channel.json',
-          null,
-          function (channelConfig) {
-            load_transient_data(channelConfig, targetName, prepare_plotly_data);
-            document.getElementById("downloadlink").setAttribute("href", channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json");
-          })
-      }
+		function() {
+        	const urlParams = new URLSearchParams(window.location.search);
+			const targetName = urlParams.get('target');
+        	const channel = urlParams.get('channel');
+        	$("#channelname").html(channel);
+        	$("#channelname-form").attr('value',channel);
+        	var url = window.location.href.substr(0, window.location.href.lastIndexOf('?'));
+        	url = url.substr(0, url.lastIndexOf('/'));
+        	$.getJSON(url+'/'+channel+'/channel.json',
+        		null,
+    			function (channelConfig) {
+    				load_transient_data(channelConfig, targetName, prepare_plotly_data);
+					document.getElementById("downloadlink").setAttribute(
+						"href", 
+						channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json"
+					);
+				}
+			)
+		}
     );
 
-  </script>
+</script>
 
 </head>
 
