@@ -86,8 +86,8 @@
       // alert(detections[0]._id);
       create_plot(transientSummary, lcdata, lclims);
 
-      $("#tran-id").text(transientSummary.tran_id);
-      $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
+      // $("#tran-id").text(transientSummary.tran_id);
+      // $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
       $.each(transientSummary.journal, function(k, v){
         var dt = v.dt;
         delete v.dt;
