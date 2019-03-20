@@ -23,6 +23,18 @@
 	font-size: 18px;
 }
 
+.numberCircle {
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    padding: 8px;
+    background: #fff;
+    border: 2px solid #666;
+    color: #666;
+    text-align: center;
+    font: 16px Arial, sans-serif;
+}
+
 .journal_btn {
   background-color: #008CBA; 
   border-radius: 4px;
@@ -259,7 +271,9 @@
 
 			t0list.append(
 				'<a class="list-group-item list-group-item-action" style="background-color:' + color_map[v.tier] + 
-				'" href="#run-item-' + i + '">' + unixTimestampToDate(dt) + '</a>'
+				';white-space: nowrap" href="#run-item-' + i + '">' + 
+				'<span class="numberCircle" style="margin-right: 5px;margin-left: -5px;">T' + v.tier + '</span>' +
+				unixTimestampToDate(dt) + '</a>'
 			)
 		}
 
