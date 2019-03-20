@@ -57,9 +57,10 @@ For example:
 ls HU_TNS_MSIP/
 channel.json
 ```
+- This step is only required once
 
-5) Call the following URL in a browser (tested with firefox):
-with updated _target_ and _channel_:
+
+5) Call the following URL in a browser (tested with firefox) with updated _target_ and _channel_:
 
 https://www-zeuthen.desy.de/lc.html?target=ZTF19aalbzoh&channel=HU_TNS_MSIP
 and explicitely add a security exception for this page 
