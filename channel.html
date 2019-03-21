@@ -33,7 +33,7 @@
 
   <script>
     function ztfNightFromDate(d) {
-      return d.getFullYear().toString()+(d.getMonth()+1).toString()+d.getDate().toString();
+      return d.getFullYear().toString()+(d.getMonth()+1).toString().padStart(2,'0')+d.getDate().toString().padStart(2,'0');
     }
     function ztfNightToDate(d) {
       return new Date(parseInt(d.substr(0,4),10), parseInt(d.substr(4,2),10)-1, parseInt(d.substr(6,2),10),16,0,0);
