@@ -10,12 +10,12 @@ function argMax(array) {
 function unixTimestampToDate(unix_timestamp) {
     var ts = new Date(unix_timestamp * 1000);
     var year = ts.getFullYear().toString().substr(-2);
-    var month = ts.getMonth() + 1;
+    var month = ts.getMonth() + 1 < 10 ? '0' + (ts.getMonth() + 1) : (ts.getMonth() + 1);
     var day = ts.getDate();
     var hour = ts.getHours() < 10 ? '0' + ts.getHours() : ts.getHours();
     var min = ts.getMinutes() < 10 ? '0' + ts.getMinutes() : ts.getMinutes();
     var sec = ts.getSeconds() < 10 ? '0' + ts.getSeconds() : ts.getSeconds();
-    var date = day + '.' + month + '.' + year + ' ' + hour + ':' + min + ':' + sec;
+    var date = day + '.' + month + '.' + year + ' ' + hour + 'h' + min + 'm' + sec + 's';
     return date;
 }
 
