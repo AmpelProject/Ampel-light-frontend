@@ -392,12 +392,17 @@
 		// Convinience
 		$(document).keyup(
 			function(e) {
-				if(e.keyCode === 27)
+				e.shiftKey;
+				if(e.keyCode === 27) // 'ESC'
 					$("#journalModal").hide();
-				if(e.keyCode === 74)
-					if (!$("#target").is(":focus"))
-						$("#bShowJournal").trigger('click');
-
+				if(e.keyCode === 74) // 'j' or 'J'
+					if (!$("#target").is(":focus")) {
+						$("#journalModal").show();
+						if (e.shiftKey) // 'J'
+							$("#jbigger").trigger('click');
+						else // 'j'
+							$("#jsmaller").trigger('click');
+					}
 			}
 		);
 
