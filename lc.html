@@ -394,6 +394,9 @@
 			function(e) {
 				if(e.keyCode === 27)
 					$("#journalModal").hide();
+				if(e.keyCode === 74)
+					if (!$("#target").is(":focus"))
+						$("#bShowJournal").trigger('click');
 
 			}
 		);
