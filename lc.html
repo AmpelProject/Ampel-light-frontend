@@ -16,15 +16,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
   
 <style>
-.anyClass {
-	height:320px;
-	overflow-y: scroll;
-}
-.anyClass2 {
-	height:320px;
-	overflow-y: scroll;
-	font-size: 18px;
-}
 
 .rTable    { display: table; }
 .rTableRow       { display: table-row; }
@@ -172,7 +163,7 @@
 
 #modal {
     width: 100%;
-    height: 320;
+    height: 350;
     bottom: 0;
     position: fixed;
 }
@@ -568,20 +559,15 @@
     $(document).ready(
 		function() {
 
+			// "Full screen modal"
 			$("#jbigger").click(
 				function() {
 					$("#modal").height(
-						$(document).height() - 100
+						$(document).height() - 85 
 					);
-					$("#modal").offset({ top: 55});
-					$("#journal_entries_outer").css(
-						{"max-height": $("#modal").height() - 100}
-					)
-					$("#journal_dts_outer").css(
-						{"max-height": $("#modal").height() - 100}
-					)
-					$("#modaltable").css(
-						{"height": $("#modal").height() - 100}
+					$("#modal").offset({top: 55});
+					resize_modal_dependent_components(
+						$("#modal").height() - 85
 					)
 				}
 			);
@@ -595,6 +581,9 @@
 			$("#bShowJournal").click(
 				function() {
 					$("#journalModal").show();
+					resize_modal_dependent_components(
+						$("#modal").height() - 110
+					)
 				}
 			);
 
@@ -623,19 +612,28 @@
 			{ 
 				handles: "n",
 				stop: function( event, ui ) {
-					$("#journal_entries_outer").css(
-						{"max-height": $("#modal").height() - 100}
-					)
-					$("#journal_dts_outer").css(
-						{"max-height": $("#modal").height() - 100}
-					)
-					$("#modaltable").css(
-						{"height": $("#modal").height() - 100}
-					)
+					resize_modal_dependent_components(
+						$("#modal").height() - 110
+					);
 				}
 			}
 		);
 	});
+
+	function resize_modal_dependent_components(height) {
+
+		$("#journal_entries_outer").css(
+			{"max-height": height}
+		)
+
+		$("#journal_dts_outer").css(
+			{"max-height": height}
+		)
+
+		$("#modaltable").css(
+			{"height": height}
+		)
+	}
 
 </script>
 
@@ -714,8 +712,43 @@
   </main>
 
 
-	<!-- Trigger/Open The Modal -->
-	<button class="journal_btn" id="bShowJournal" style="margin-left: 15px">Journal</button>
+  <!-- Open journal panel -->
+  <button class="journal_btn" id="bShowJournal" style="margin-left: 15px">Journal</button>
+
+  <div id="journalModal" class="modal-outer">
+  <div class="modal-content" id="modal">
+    <div class="modal-header">
+      <h2 style="display: inline">Journal</h2>
+      <span style="float: right; display: inline;">
+		  <span class="jheaderbtn" id="jbigger">&square;</span>
+		  <span class="jheaderbtn" id="jclose">&times;</span>
+		</span>
+    </div>
+
+    <div class="modal-body">
+	<div id="modaltable" style="display: table;margin-top:10px">
+	<div style="display: table-cell; vertical-align: middle;">
+	<table>
+	<tr>
+	<td>
+		<div id="journal_dts_outer" style="overflow: scroll">
+		<div class="rTable" id="journal_dt"/>
+		</div>
+	</td>
+	<td>
+		<div id="journal_entries_outer" style="max-height:220px; padding-left:30px; padding-right:30px; overflow: scroll">
+			<div class="rTable" id="journal_entries_inner"/>
+		</div>
+	</td>
+	</tr>
+	</table>
+	</div>
+	</div>
+  </div>
+
+</div>
+</div>
+
 
   <footer class="footer fixed-bottom text-center bg-light border-top">
     <nav class="navbar navbar-expand-sm bg-light py-0 navbar-light" style="font-size:15px">
@@ -737,40 +770,9 @@
     </nav>
 
   </footer>
-  </wrapper>
 
-  <div id="journalModal" class="modal-outer">
-  <div class="modal-content" id="modal">
-    <div class="modal-header">
-      <h2 style="display: inline">Journal</h2>
-      <span style="float: right; display: inline;">
-		  <span class="jheaderbtn" id="jbigger">&square;</span>
-		  <span class="jheaderbtn" id="jclose">&times;</span>
-		</span>
-    </div>
 
-    <div class="modal-body">
-	<div id="modaltable" style="display: table;margin-top:15px">
-	<div style="display: table-cell; vertical-align: middle;">
-	<table>
-	<tr>
-	<td>
-		<div id="journal_dts_outer" style="overflow: scroll">
-		<div class="rTable" id="journal_dt"/>
-		</div>
-	</td>
-	<td>
-		<div id="journal_entries_outer" style="max-height:220px; padding-left:30px; padding-right:30px; overflow: scroll">
-			<div class="rTable" id="journal_entries_inner"/>
-		</div>
-	</td>
-	</tr>
-	</table>
-	</div>
-	</div>
-  </div>
-
-</div>
+</wrapper>
 
 </body>
 </html>
