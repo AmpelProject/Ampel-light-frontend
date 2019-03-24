@@ -580,6 +580,9 @@
 					$("#journal_dts_outer").css(
 						{"max-height": $("#modal").height() - 100}
 					)
+					$("#modaltable").css(
+						{"height": $("#modal").height() - 100}
+					)
 				}
 			);
 
@@ -625,6 +628,9 @@
 					)
 					$("#journal_dts_outer").css(
 						{"max-height": $("#modal").height() - 100}
+					)
+					$("#modaltable").css(
+						{"height": $("#modal").height() - 100}
 					)
 				}
 			}
@@ -744,7 +750,7 @@
     </div>
 
     <div class="modal-body">
-	<div style="display: table; height:100%;">
+	<div id="modaltable" style="display: table;margin-top:15px">
 	<div style="display: table-cell; vertical-align: middle;">
 	<table>
 	<tr>
