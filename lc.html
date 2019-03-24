@@ -568,7 +568,16 @@
 					$("#modal").offset({top: 55});
 					resize_modal_dependent_components(
 						$("#modal").height() - 85
-					)
+					);
+				}
+			);
+
+			$("#jsmaller").click(
+				function(e) {
+					e.stopPropagation();
+					$("#modal").height(350);
+					$("#modal").offset({top: $(document).height() - 350});
+					resize_modal_dependent_components(235);
 				}
 			);
 
@@ -721,6 +730,7 @@
       <h2 style="display: inline">Journal</h2>
       <span style="float: right; display: inline;">
 		  <span class="jheaderbtn" id="jbigger">&square;</span>
+		  <span class="jheaderbtn" style='font-size:16px;' id="jsmaller">&square;</span>
 		  <span class="jheaderbtn" id="jclose">&times;</span>
 		</span>
     </div>
