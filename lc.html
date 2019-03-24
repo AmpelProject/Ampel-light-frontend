@@ -616,6 +616,17 @@
 					);
 				}
 			)
+
+			var jpanel = urlParams.get('jpanel');
+			if (jpanel != null) {
+				if (jpanel == "small") {
+					$("#bShowJournal").trigger('click');
+				}
+				else if (jpanel == "big") {
+					$("#journalModal").show();
+					$("#jbigger").trigger('click');
+				}
+			}
 		}
     );
 
