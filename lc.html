@@ -62,15 +62,14 @@
 .journal_btn {
   background-color: #008CBA; 
   border-radius: 4px;
-  width: 130px;
+  width: 115px;
   border: none;
   color: white;
-  padding: 10px 32px;
+  padding: 6px 25px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  margin: 4px 2px;
   cursor: pointer;
   -webkit-transition-duration: 0.4s; /* Safari */
   transition-duration: 0.4s;
@@ -78,6 +77,30 @@
 
 .journal_btn:hover {
   box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+.t2-div-outer {
+	border: 1px solid black;
+	width: auto;
+	display: inline-block;
+	height: 250px;
+	overflow: scroll;
+	background: #d3d3d34d;
+	padding: 20px;
+	box-shadow: 0px 0px 10px 2px lightgray;
+}
+
+.t2-div-inner {
+}
+
+.t2-title {
+	display: block;
+	align-content: center;
+	width: 100%;
+	font-weight: bold;
+	text-align: center;
+	font-size: larger;
+	margin-bottom: 8px;
 }
 
 /* The Modal (background) */
@@ -181,6 +204,15 @@
 <script type="text/javascript" src="js/libs/pretty-json-min.js"></script>
 
 <script>
+	t2modules = {};
+</script>
+
+<script type="module">
+	import * as catalogmatch from './js/plugins/catalogmatch.js';
+	t2modules['catalogmatch'] = catalogmatch;
+</script>
+
+<script>
 
 	journal_nodes = {};
 	jdivresizable = null;
@@ -252,6 +284,36 @@
 			"http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+ztfName
 		);
 
+		for (var i=0; i<transientView.t2records.length; i++) {
+			var t2UnitId = transientView.t2records[i].t2_unit_id.toLowerCase();
+			if (t2UnitId in t2modules) {
+
+				// Clean up
+				delete transientView.t2records[i]['__jsonclass__'];
+				delete transientView.t2records[i]['tran_id'];
+				//transientView.t2records[i]['results'][transientView.t2records[i]['results'].length-1]['output'].expandAll();
+				var outdom = transientView.t2records[i]['results'][
+					transientView.t2records[i]['results'].length-1
+				]['output'];
+
+				// Dynamically create div
+				$(
+					"<div style='width:max-content;margin-left:20px'><div class=t2-title>"+ t2UnitId+"</div><div id=" + 
+					t2UnitId + "-" + i + "-outer class=t2-div-outer><div id=" +
+					t2UnitId + "-" + i + "-inner class=t2-div-inner></div></div></div>"
+				).appendTo('#t2divs');
+
+				// The plugin rendering function
+				t2modules[t2UnitId].display(
+					transientView.t2records[i],
+					t2UnitId + "-" + i
+				)
+			}
+			else {
+				console.log("T2 plugin not avail for "+ t2UnitId);
+			}
+		}
+
 		for (var i=1; i<transientSummary.tran_names.length; i++) {
 			if (transientSummary.tran_names[i].startsWith("TNS")) {
 				var name = transientSummary.tran_names[i].substr(3);
@@ -282,7 +344,6 @@
 				'<div id="journal-item-' + i + '" class="rTableRow je tier' + v.tier + '">' + 
 				'</div>'
 			);
-
 
 			journal_nodes[i] = new PrettyJSON.view.Node(
 				{
@@ -397,6 +458,7 @@
 					$("#jclose").trigger('click');
 				if(e.keyCode === 74) // 'j' or 'J'
 					if (!$("#target").is(":focus")) {
+						$("#bShowJournal").hide();
 						$("#journalModal").show();
 						if (e.shiftKey) // 'J'
 							$("#jbigger").trigger('click');
@@ -573,7 +635,7 @@
 					$(document.body).css({'overflow': 'hidden'});
 					$("#modal").height(window.innerHeight - 55);
 					resize_modal_dependent_components(
-						$("#modal").height() - 115
+						$("#modal").height() - 110
 					);
 				}
 			);
@@ -589,6 +651,7 @@
 
 			$("#jclose").click(
 				function() {
+					$("#bShowJournal").show();
 					$("#journalModal").hide();
 					$(document.body).css(
 						{'overflow': 'auto'}
@@ -600,6 +663,7 @@
 				function() {
 					$(document.body).css({'overflow': 'hidden'});
 					$("#journalModal").show();
+					$("#bShowJournal").hide();
 					resize_modal_dependent_components(
 						$("#modal").height() - 110
 					)
@@ -621,6 +685,7 @@
 						"href", 
 						channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json"
 					);
+					$("#bShowJournal").show();
 				}
 			)
 
@@ -689,6 +754,8 @@
       </li>
     </ul>
 
+ 	<button class="journal_btn" id="bShowJournal" style="margin-left: 15px; display:hidden">Journal</button>
+
     <form class="form-inline my-2 my-lg-0  ml-auto", method="GET">
         <input class="form-control mr-sm-2" type="search" id="target" name="target", placeholder="Target Name" aria-label="Search">
         <input type="hidden" id="channelname-form" name="channel">
@@ -743,7 +810,7 @@
 
 
   <!-- Open journal panel -->
-  <button class="journal_btn" id="bShowJournal" style="margin-left: 15px">Journal</button>
+   <div id="t2divs" style="margin-bottom: 60px;"></div>
 
   <div id="journalModal" class="modal-outer">
   <div class="modal-content" id="modal">
@@ -794,7 +861,7 @@
           <a class="nav-link" href="mailto:ampel-info@desy.de">Contact us</a>
         </li>
       </ul>
-
+	  
       <form class="form-inline my-2 my-lg-0  ml-auto">
           <a class="nav-link fa" style="color:black;font-size:24px" href="https://github.com/AmpelProject" target="_blank"> &#xf09b; </a>
       </form>
