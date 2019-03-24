@@ -394,7 +394,7 @@
 			function(e) {
 				e.shiftKey;
 				if(e.keyCode === 27) // 'ESC'
-					$("#journalModal").hide();
+					$("#jclose").trigger('click');
 				if(e.keyCode === 74) // 'j' or 'J'
 					if (!$("#target").is(":focus")) {
 						$("#journalModal").show();
@@ -408,8 +408,8 @@
 
 		$("#journalModal").click(
 			function(e) {
-				if (e.clientY < $("#modal").offset().top)
-					$("#journalModal").hide();
+				if (e.target.id == "journalModal")
+					$("#jclose").trigger('click');
 			}
 		)
 
@@ -570,12 +570,10 @@
 			// "Full screen modal"
 			$("#jbigger").click(
 				function() {
-					$("#modal").height(
-						$(document).height() - 85 
-					);
-					$("#modal").offset({top: 55});
+					$(document.body).css({'overflow': 'hidden'});
+					$("#modal").height(window.innerHeight - 55);
 					resize_modal_dependent_components(
-						$("#modal").height() - 85
+						$("#modal").height() - 115
 					);
 				}
 			);
@@ -583,8 +581,8 @@
 			$("#jsmaller").click(
 				function(e) {
 					e.stopPropagation();
+					$(document.body).css({'overflow': 'hidden'});
 					$("#modal").height(350);
-					$("#modal").offset({top: $(document).height() - 350});
 					resize_modal_dependent_components(235);
 				}
 			);
@@ -592,11 +590,15 @@
 			$("#jclose").click(
 				function() {
 					$("#journalModal").hide();
+					$(document.body).css(
+						{'overflow': 'auto'}
+					);
 				}
 			);
 
 			$("#bShowJournal").click(
 				function() {
+					$(document.body).css({'overflow': 'hidden'});
 					$("#journalModal").show();
 					resize_modal_dependent_components(
 						$("#modal").height() - 110
