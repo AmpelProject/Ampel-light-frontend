@@ -359,14 +359,21 @@ function get_datatest () {
 }
 
 function load_transient_data (channelConfig, targetName, callback) {
-  var transient = null;
-  $.getJSON(channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=transient.json",
-    null,
-    function (transientSummary) { 
-      $.getJSON(channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json",
-        null,
-        function (transientView) {
-          callback(channelConfig, transientSummary, transientView);
-        })
-    });
+
+	var transient = null;
+
+	// jQuery.getJSON( url [, data ] [, success ] )
+	$.getJSON(
+		channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=transient.json",
+		null,
+		function (transientSummary) { 
+			$.getJSON(
+				channelConfig.baseURL+"/download?path=%2F"+targetName+"&files=dump.json",
+				null,
+				function (transientView) {
+					callback(channelConfig, transientSummary, transientView);
+				}
+			)
+    	}
+	);
 }
