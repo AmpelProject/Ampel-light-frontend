@@ -405,6 +405,13 @@
 			}
 		);
 
+		$("#journalModal").click(
+			function(e) {
+				if (e.clientY < ($(document).height() - $("#modal").height()))
+					$("#journalModal").hide();
+			}
+		)
+
 		var lcdata = get_plotly_data(transientView.photopoints, channel_config);
 		var lclims = get_plotly_upperlimit(transientView.upperlimits);
 
