@@ -272,7 +272,7 @@
 		// $("#tran-id").text(transientSummary.tran_id);
 		// $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
 		var jdt = $("#journal_dt");
-		var je = $("#journal_entries_outer");
+		var je = $("#journal_entries_inner");
 
 		color_map = [
     		"#d3d0cb", // tier 0
@@ -409,7 +409,7 @@
 
 		$("#journalModal").click(
 			function(e) {
-				if (e.clientY < ($(document).height() - $("#modal").height()))
+				if (e.clientY < $("#modal").offset().top)
 					$("#journalModal").hide();
 			}
 		)
@@ -574,11 +574,11 @@
 						$(document).height() - 100
 					);
 					$("#modal").offset({ top: 55});
-					$("#journal_entries_inner").css(
-						{
-							"max-height": $("#modal").height() - 100,
-							//"height": $("#modal").height() - 100,
-						}
+					$("#journal_entries_outer").css(
+						{"max-height": $("#modal").height() - 100}
+					)
+					$("#journal_dts_outer").css(
+						{"max-height": $("#modal").height() - 100}
 					)
 				}
 			);
@@ -620,10 +620,11 @@
 			{ 
 				handles: "n",
 				stop: function( event, ui ) {
-					$("#journal_entries_inner").css(
-						{
-							"max-height": $("#modal").height() - 100
-						}
+					$("#journal_entries_outer").css(
+						{"max-height": $("#modal").height() - 100}
+					)
+					$("#journal_dts_outer").css(
+						{"max-height": $("#modal").height() - 100}
 					)
 				}
 			}
@@ -748,11 +749,13 @@
 	<table>
 	<tr>
 	<td>
-		<div class="rTable" id="journal_dt"></div>
+		<div id="journal_dts_outer" style="overflow: scroll">
+		<div class="rTable" id="journal_dt"/>
+		</div>
 	</td>
 	<td>
-		<div id="journal_entries_inner" style="max-height:220px; padding-left:30px; padding-right:30px; overflow: scroll">
-			<div class="rTable" id="journal_entries_outer"></div>
+		<div id="journal_entries_outer" style="max-height:220px; padding-left:30px; padding-right:30px; overflow: scroll">
+			<div class="rTable" id="journal_entries_inner"/>
 		</div>
 	</td>
 	</tr>
