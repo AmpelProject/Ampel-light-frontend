@@ -12,31 +12,26 @@
   <link rel="stylesheet" href="cutout-zoom.css">
   
   <style>
-    .anyClass {
-  height:280px;
-  overflow-y: scroll;
-}
-.anyClass2 {
-  height:280px;
-  overflow-y: scroll;
-  font-size: 18px;
-}
-
+  .clickable-row {
+  	cursor: pointer;
+  }
   </style>
 
   <script src="config.js"></script>
-
   <script src="load_data.js"></script>
-
   <script src="toolbox.js"></script>
-
 
   <script>
     function ztfNightFromDate(d) {
-      return d.getFullYear().toString()+(d.getMonth()+1).toString().padStart(2,'0')+d.getDate().toString().padStart(2,'0');
+      return d.getFullYear().toString()+(d.getMonth()+1).toString().padStart(2,'0') +
+		d.getDate().toString().padStart(2,'0');
     }
     function ztfNightToDate(d) {
-      return new Date(parseInt(d.substr(0,4),10), parseInt(d.substr(4,2),10)-1, parseInt(d.substr(6,2),10),16,0,0);
+      return new Date(
+		  parseInt(d.substr(0,4),10), 
+		  parseInt(d.substr(4,2),10)-1, 
+		  parseInt(d.substr(6,2),10),16,0,0
+	  );
     }
     function format_jd(jd) {
       const seconds = (Date.now() - julianDateToDate(jd))/1000;
