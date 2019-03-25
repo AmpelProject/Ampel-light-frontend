@@ -499,6 +499,27 @@
       // FIXME make async
       load_sdss_image(transientSummary);
 
+	  // PPS hover labels
+	  var ppsHoverText = [];
+	  for (var i=0; i<lcdata.x.length; i++) {
+		var dts = lcdata.x[i].toISOString().replace("T", " ");
+		ppsHoverText.push( 
+			"Mag: " + lcdata.y[i].toFixed(2) + " &plusmn; " + lcdata.dy[i].toFixed(2) +
+			"<br>UTC: " + dts.substr(0, dts.length-5) + 
+			"<br>PP-ID: " + lcdata.id[i]
+		);
+	  }
+
+	  // ULS hover labels
+	  var ulsHoverText = [];
+	  for (var i=0; i<lclims.x.length; i++) {
+		var dts = lclims.x[i].toISOString().replace("T", " ");
+		ulsHoverText.push( 
+			"Maglim: " + lclims.y[i].toFixed(2) +
+			"<br>UTC: " + dts.substr(0, dts.length-5)
+		);
+	  }
+
       var data = [
           // PhotoPoints
           {
@@ -510,7 +531,8 @@
               array: lcdata.dy,
               color: "grey",
             },
-            text: lcdata.id,
+            text: ppsHoverText,
+			hoverinfo: 'text',
             // shape
             mode: 'markers',
             type: 'scatter',
@@ -525,6 +547,8 @@
           {
             x: lclims.x,
             y: lclims.y,
+            text: ulsHoverText,
+			hoverinfo: 'text',
             mode: 'markers',
             type: 'scatter',
             hidden: true,
@@ -542,9 +566,12 @@
         var margin = {top:30};
         var myDiv = document.getElementById('lc_plot');
         var sdssimg = document.getElementById("sdssimg");
+
+
         var layout = {
             //title: transient.ztfName,
-          hovermode: "closest",
+          	hovermode: "closest",
+          	hoverdistance: 3,
             autoscale: false,
             height: "px",
             margin: {t: margin.top},
