@@ -264,36 +264,36 @@
 		);
 	}
 
-    function prepare_plotly_data(channel_config, transientSummary, transientView) {
+    function prepare_plotly_data(channel_config, dumpData) {
 
-		transientSummary["ra"]  = Plotly.d3.min(
-			transientView.photopoints.map(
+		dumpData["ra"]  = Plotly.d3.min(
+			dumpData.photopoints.map(
 				  function(d) {return d.content.ra;}
 			)
 	  	);
-		transientSummary["dec"] = Plotly.d3.min(
-			transientView.photopoints.map(
+		dumpData["dec"] = Plotly.d3.min(
+			dumpData.photopoints.map(
 				function(d) {return d.content.dec;}
 			)
 		);
-		transientSummary["tran_names"] = transientView["tran_names"]
-		var ztfName = transientSummary["tran_names"][0]
+		dumpData["tran_names"] = dumpData["tran_names"]
+		var ztfName = dumpData["tran_names"][0]
 
 		$("#targetname").html(ztfName).attr(
 			"href", 
 			"http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+ztfName
 		);
 
-		for (var i=0; i<transientView.t2records.length; i++) {
-			var t2UnitId = transientView.t2records[i].t2_unit_id.toLowerCase();
+		for (var i=0; i<dumpData.t2records.length; i++) {
+			var t2UnitId = dumpData.t2records[i].t2_unit_id.toLowerCase();
 			if (t2UnitId in t2modules) {
 
 				// Clean up
-				delete transientView.t2records[i]['__jsonclass__'];
-				delete transientView.t2records[i]['tran_id'];
-				//transientView.t2records[i]['results'][transientView.t2records[i]['results'].length-1]['output'].expandAll();
-				var outdom = transientView.t2records[i]['results'][
-					transientView.t2records[i]['results'].length-1
+				delete dumpData.t2records[i]['__jsonclass__'];
+				delete dumpData.t2records[i]['tran_id'];
+				//dumpData.t2records[i]['results'][dumpData.t2records[i]['results'].length-1]['output'].expandAll();
+				var outdom = dumpData.t2records[i]['results'][
+					dumpData.t2records[i]['results'].length-1
 				]['output'];
 
 				// Dynamically create div
@@ -305,7 +305,7 @@
 
 				// The plugin rendering function
 				t2modules[t2UnitId].display(
-					transientView.t2records[i],
+					dumpData.t2records[i],
 					t2UnitId + "-" + i
 				)
 			}
@@ -314,16 +314,16 @@
 			}
 		}
 
-		for (var i=1; i<transientSummary.tran_names.length; i++) {
-			if (transientSummary.tran_names[i].startsWith("TNS")) {
-				var name = transientSummary.tran_names[i].substr(3);
+		for (var i=1; i<dumpData.tran_names.length; i++) {
+			if (dumpData.tran_names[i].startsWith("TNS")) {
+				var name = dumpData.tran_names[i].substr(3);
 				$("#tnsname").text("TNS:"+name).attr("href", "https://wis-tns.weizmann.ac.il/object/"+name);
 				break;
 			}
 		}
       
-		// $("#tran-id").text(transientSummary.tran_id);
-		// $("#comp-id").text(b64toHex(transientSummary.latest_state.$binary));
+		// $("#tran-id").text(dumpData.tran_id);
+		// $("#comp-id").text(b64toHex(dumpData.latest_state.$binary));
 		var jdt = $("#journal_dt");
 		var je = $("#journal_entries_inner");
 
@@ -334,9 +334,9 @@
     		"#85bdbab3" // tier 3
 		]
 
-		for (let i=transientSummary.journal.length-1; i >=0 ; i--) {
+		for (let i=dumpData.journal.length-1; i >=0 ; i--) {
 
-			var v = transientSummary.journal[i];
+			var v = dumpData.journal[i];
 			var dt = v.dt;
 			delete v.dt;
 
@@ -410,7 +410,7 @@
 			}
 		);
 
-		for (let i=0; i<transientSummary.journal.length; i++) {
+		for (let i=0; i<dumpData.journal.length; i++) {
 
 			$('#journal-link-'+ i).click(
 				function() {
@@ -475,11 +475,11 @@
 			}
 		)
 
-		var lcdata = get_plotly_data(transientView.photopoints, channel_config);
-		var lclims = get_plotly_upperlimit(transientView.upperlimits);
+		var lcdata = get_plotly_data(dumpData.photopoints, channel_config);
+		var lclims = get_plotly_upperlimit(dumpData.upperlimits);
 
 		// alert(detections[0]._id);
-		create_plot(transientSummary, lcdata, lclims);
+		create_plot(dumpData, lcdata, lclims);
     }
 
 	function get_tier(span) {
@@ -494,10 +494,10 @@
 		}
 	}
 
-    function create_plot(transientSummary, lcdata, lclims) {
+    function create_plot(dumpData, lcdata, lclims) {
 
       // FIXME make async
-      load_sdss_image(transientSummary);
+      load_sdss_image(dumpData);
 
 	  // PPS hover labels
 	  var ppsHoverText = [];
