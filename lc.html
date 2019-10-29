@@ -284,7 +284,7 @@
 			"http://skipper.caltech.edu:8080/cgi-bin/growth/view_source.cgi?name="+ztfName
 		);
 
-		for (var i=0; i<dumpData.t2records.length; i++) {
+		for (var i=0; i<(dumpData.t2records ? dumpData.t2records.length : 0); i++) {
 			var t2UnitId = dumpData.t2records[i].t2_unit_id.toLowerCase();
 			if (t2UnitId in t2modules) {
 
